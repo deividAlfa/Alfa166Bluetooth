@@ -1,0 +1,8 @@
+/Debug/Src
+/Debug/Startup
+/Release/Src
+/Release/Startup
+/Debug/*.mk
+/Debug/*.map
+/Release/*.mk
+/Release/*.map
