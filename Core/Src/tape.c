@@ -1,7 +1,7 @@
 /*
  * tape.c
  *
- *  Created on: Dec 22, 2020
+ *  Created on: Jan 12, 2021 Dec 22, 2020
  *      Author: David
  */
 #include "tape.h"
@@ -16,6 +16,7 @@ void initTape(void){
 	pos.OutStatus	= pos_2_5V;																// Default analog status = Tape inside
 	pos.Status		= 0;																	// First state
 	pos.Direction	= 1;																	// Initial position changing direction
+	tape.polarity	= !HAL_GPIO_ReadPin(POLARITY_GPIO_Port, POLARITY_Pin);
 	resetButtons();																			// Set all buttons to idle
 }
 

@@ -86,7 +86,8 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
-  initTape();																// Initialize tape settings
+  HAL_Delay(10);
+  initTape();														// Initialize tape settings
   /* USER CODE END 2 */
 
   /* Infinite loop */
