@@ -10,19 +10,21 @@
 
 	tape_t	tape;
 	position_t	pos;
+	uint8_t BTStatus=status_play;
 
 void initTape(void){
 	tape.status		= status_stop;															// Initial state stop
 	pos.OutStatus	= pos_2_5V;																// Default analog status = Tape inside
 	pos.Status		= 0;																	// First state
 	pos.Direction	= 1;																	// Initial position changing direction
-	tape.polarity	= !HAL_GPIO_ReadPin(POLARITY_GPIO_Port, POLARITY_Pin);
+	tape.polarity	= HAL_GPIO_ReadPin(POLARITY_GPIO_Port, POLARITY_Pin);
+	BTStatus=status_play;
 	resetButtons();																			// Set all buttons to idle
 }
 
 void handleTape(void){
 
-	tape.polarity	= !HAL_GPIO_ReadPin(POLARITY_GPIO_Port, POLARITY_Pin);					// Update button polarity (So it can be changed on the fly)
+	tape.polarity	= HAL_GPIO_ReadPin(POLARITY_GPIO_Port, POLARITY_Pin);					// Update button polarity (So it can be changed on the fly)
 	handlePosSensor();																		// Handle position sensor
 
 	  /*********************************************************************************************************************
@@ -57,11 +59,17 @@ void handleTape(void){
 					  if( (tape.status==status_ffwd)||(tape.status==status_frwd) ){			// Was in a fast mode before?
 						  if( (HAL_GetTick()-tape.fastTimer) < btnRepTim){					// Check the timer, if it's low, the user exited fast mode by pushing the button again (Repeat button push)
 							  if(tape.btnLast==btn_prev){									// Previous track button was pushed
+								  BTStatus=status_play;
 								  setButton(btn_prev);										// Repeat
 							  }
 							  if(tape.btnLast==btn_next){									// Next track button was pushed
+								  BTStatus=status_play;
 								  setButton(btn_next);										// Repeat
 							  }
+						  }
+						  else if(BTStatus==status_pause){
+							  BTStatus=status_play;
+							  setButton(btn_play_pause);									// Repeat
 						  }
 					  }
 					  tape.status	= status_play;											// In any case, now we are in play mode
@@ -115,7 +123,7 @@ void handleTape(void){
 			  tape.skipCnt		= 0;														// Reset the counter
 		  }
 	  }
-	  if(tape.btnPushed){																	// If any button was pushed
+	 if(tape.btnPushed){																	// If any button was pushed
 		  if((HAL_GetTick()-tape.btnTimer)>btnDelay){										// If the button timer has expired
 			  resetButtons();																// Reset all the buttons
 		  }
@@ -206,22 +214,27 @@ void handlePosSensor(void){
 }
 
 void setButton(uint8_t btn){
-	tape.btnLast	= btn;																	// Store button
 	tape.btnPushed	= 1;																	// Set flag
 	tape.btnTimer	= HAL_GetTick();														// Load timer
 
 	switch(btn){																			// Find what button to enable
 
 		case btn_prev:																		// Previous track button
-			HAL_GPIO_WritePin(BTN_PREV_GPIO_Port,BTN_PREV_Pin,tape.polarity);				// Set output depending on the polarity
+			tape.btnLast	= btn;																	// Store button
+			HAL_GPIO_WritePin(BTN_PREV_GPIO_Port,BTN_PREV_Pin,!tape.polarity);				// Set output depending on the polarity
 			break;
 
 		case btn_next:																		// Next track button
-			HAL_GPIO_WritePin(BTN_NEXT_GPIO_Port,BTN_NEXT_Pin,tape.polarity);				// Set output depending on the polarity
+			tape.btnLast	= btn;																	// Store button
+			HAL_GPIO_WritePin(BTN_NEXT_GPIO_Port,BTN_NEXT_Pin,!tape.polarity);				// Set output depending on the polarity
 			break;
 
 		case btn_call:																		// Call button
-			HAL_GPIO_WritePin(BTN_CALL_GPIO_Port,BTN_CALL_Pin,tape.polarity);				// Set output depending on the polarity
+			HAL_GPIO_WritePin(BTN_CALL_GPIO_Port,BTN_CALL_Pin,!tape.polarity);				// Set output depending on the polarity
+			break;
+
+		case btn_play_pause:																		// Call button
+			HAL_GPIO_WritePin(BTN_PLAY_PAUSE_GPIO_Port,BTN_PLAY_PAUSE_Pin,!tape.polarity);				// Set output depending on the polarity
 			break;
 
 		default:																			// We shouldn't get any unknown value
@@ -231,10 +244,40 @@ void setButton(uint8_t btn){
 }
 
 void resetButtons(void){
-	tape.btnPushed	= 0;																		// Clear flag
-	HAL_GPIO_WritePin(BTN_PREV_GPIO_Port,BTN_PREV_Pin,!tape.polarity);						// Set all buttons to idle state depending on the polarity
-	HAL_GPIO_WritePin(BTN_NEXT_GPIO_Port,BTN_NEXT_Pin,!tape.polarity);
-	HAL_GPIO_WritePin(BTN_CALL_GPIO_Port,BTN_CALL_Pin,!tape.polarity);
+	enum{
+		pause_idle,
+		pause_set,
+		pause_wait
+	};
+
+	static uint8_t status=pause_idle;
+
+	if((tape.status==status_frwd)||(tape.status==status_ffwd)){
+		if(status==pause_idle){
+			status=pause_set;
+			HAL_GPIO_WritePin(BTN_PREV_GPIO_Port,BTN_PREV_Pin,tape.polarity);
+			HAL_GPIO_WritePin(BTN_NEXT_GPIO_Port,BTN_NEXT_Pin,tape.polarity);
+			tape.btnTimer	= HAL_GetTick();
+		}
+		else if(status==pause_set){
+			status=pause_wait;
+			setButton(btn_play_pause);
+		}
+		else if(status==pause_wait){
+			status=pause_idle;
+			HAL_GPIO_WritePin(BTN_PLAY_PAUSE_GPIO_Port,BTN_PLAY_PAUSE_Pin,tape.polarity);
+			tape.btnPushed	= 0;
+			BTStatus=status_pause;
+		}
+	}
+	else{
+		tape.btnPushed	= 0;
+		status=pause_idle;
+		HAL_GPIO_WritePin(BTN_PREV_GPIO_Port,BTN_PREV_Pin,tape.polarity);
+		HAL_GPIO_WritePin(BTN_NEXT_GPIO_Port,BTN_NEXT_Pin,tape.polarity);
+		HAL_GPIO_WritePin(BTN_CALL_GPIO_Port,BTN_CALL_Pin,tape.polarity);
+		HAL_GPIO_WritePin(BTN_PLAY_PAUSE_GPIO_Port,BTN_PLAY_PAUSE_Pin,tape.polarity);
+	}
 }
 
 void handleLed(void){

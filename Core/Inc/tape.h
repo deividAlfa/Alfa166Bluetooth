@@ -1,7 +1,7 @@
 /*
  * tape.h
  *
- *  Created on: Dec 22, 2020
+ *  Created on: Jan 12, 2021 Dec 22, 2020
  *      Author: David
  */
 
@@ -46,6 +46,7 @@ enum{
 
   status_stop,													// In stop mode
   status_play,													// Playing
+  status_pause,													// Pause
   status_frwd,													// Fast rewind
   status_ffwd,													// Fast forward
 
@@ -55,6 +56,8 @@ enum{
   btn_next,														// Next track button
   btn_prev,														// Previous track button
   btn_call,														// Call button
+  btn_play_pause,
+
 };
 
 
@@ -87,9 +90,9 @@ typedef struct{
 
 // Pretty critical timings. Extensively tested, lower times can cause ocassional failures
 																// Delays in mS
-#define positionDelay					(uint8_t)	80			// Delay before changing positions, to let the controller process the signal and turn on/off the position motor. Less than 80mS will randomly fail
+#define positionDelay					(uint8_t)	100			// Delay before changing positions, to let the controller process the signal and turn on/off the position motor. Less than 80mS will randomly fail
 #define pulseDelay						(uint8_t)	10			// High/Low times for photo sensor signal generation (F = 50Hz)
-#define longPhotoDelay					(uint16_t)	1200		// Photo sensor long delay time (to prevent fault detection if too many fast skips)
+#define longPhotoDelay					(uint16_t)	1300		// Photo sensor long delay time (to prevent fault detection if too many fast skips)
 #define btnDelay						(uint8_t)	100			// Button pulsed time (Most modules will ignore shorter times)
 #define btnRepTim						(uint16_t)	1000		// Time limit to recognize repeated button presses (The controller reverts automatically to play mode in 1.2-1.3 seconds, so below 1 second it's safe)
 #define resetTimeOnPlay					(uint16_t)	2000		// Time in play mode to reset the fast skip counter
