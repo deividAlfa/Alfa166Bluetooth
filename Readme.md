@@ -9,6 +9,9 @@
 
 <!-- /MarkdownTOC -->
 
+Video:
+https://youtu.be/hq1ijzfhlmo
+
 <a id="description"></a>
 ## Project description
 The cassette (or tape) is nowadays something extinct and it's presence has no useful value.
