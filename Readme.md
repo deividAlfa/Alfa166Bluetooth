@@ -94,7 +94,7 @@ You will need, at least:
 
   - 2x 470ohm
   
-  - 3x 1K
+  - 4x 1K
   
   - 1x 6K8
   
