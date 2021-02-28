@@ -3,6 +3,7 @@
 <!-- MarkdownTOC -->
 
 * [Project description](#description)
+* [How to use](#use)
 * [Firmware](#firmware)
 * [Requirements](#requirements)
 * [Connection diagram](#connection)
@@ -20,8 +21,7 @@ In embeds a tape slot and a external CD changer. Actually, bluetooth is almost m
 Since the tape is not going to be used, it's a potential audio input that could be used for something else.<br>
 
 This firmware is the result of the reverse engineering of the tape mechanism: it emulates the tape presence, its states and sensors.<br>
-Extensive testing has been done to find the best timings for the fastest response and stable operation.<br>
-Furthermore, it's completely aware of the actual state, and can extract useful data from it, like sending pulses to a bluetooth module buttons.<br>
+It's completely aware of the actual state, and can extract useful data from it, like sending pulses to a bluetooth module buttons.<br>
 When fast forward / fast rewind is selected, the firmware interprets this and generates a pulse to  NEXT or PREVIOUS track button.<br>
 Also, it will simulate the end of the tape instantly, and force the tape returning to play mode.<br>
 The tape controller returns to play state in approximately 1.2 seconds after the tape is simulated to reach its end.<br>
@@ -30,7 +30,7 @@ This premature return to play state is detected, and an aditional pulse is gener
 
 The tape controller will detect a jam in the tape mechanism if more than 3 tracks are skipped quickly, so, to avoid that, an adittional 1.2 second delay is added after the 3rd fast skip.<br>
 This delay is only needed if the tape doesn't play for at least 2 seconds between a track change.<br>
-The user doesn't need to be aware, all is handled by the firmware. But you will notice that after the 3rd fast skip, the next one delays a bit more.<br>
+You will notice that after the 3rd fast skip, the next one delays a bit more.<br>
 The counter is resetted after the delay or 2 seconds in play state.<br>
 
 While in play mode, if the user pushes the "1-2" button (change tape play direction), this is detected and the CALL output is activated.<br>
@@ -51,6 +51,13 @@ The code doesn't use any special peripheral and can be very easily ported to oth
 
 **As the ICS mutes the audio for ~3 seconds when skipping tracks, the songs would lose that time.<br>
 The last version also modifies the circuit for play/pause control. Now it puts the bluetooth in pause for that time, so the songs start correctly.**
+
+<a id="use"></a>
+## How to use
+
+Connect to the bluetooth module and manually start playing in the phone controls.
+Select Tape playback in the ICS controls.
+Now the music should be playing. Use the steering wheel or ICS controls to skip tracks.
 
 <a id="firmware"></a>
 ## Firmware
