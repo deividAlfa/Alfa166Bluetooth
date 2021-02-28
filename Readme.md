@@ -55,9 +55,9 @@ The last version also modifies the circuit for play/pause control. Now it puts t
 <a id="use"></a>
 ## How to use
 
-Connect to the bluetooth module and manually start playing in the phone controls.
-Select Tape playback in the ICS controls.
-Now the music should be playing. Use the steering wheel or ICS controls to skip tracks.
+- Connect to the bluetooth module and manually start playing in the phone controls.<br>
+- Select Tape playback in the ICS controls.<br>
+- Now the music should be playing. Use the steering wheel or ICS controls to skip tracks.<br>
 
 <a id="firmware"></a>
 ## Firmware
