@@ -49,7 +49,7 @@ To debug the state of the board, the led is used.<br>
 The firmware is implemented in a cheap STM32F103 "blue pill" board ($3).<br>
 The code doesn't use any special peripheral and can be very easily ported to other devices, all needed are some GPIOs and a timer to provide timing control.
 
-**As the ICS mutes the audio for ~3 seconds, when skippign tracks, all the songs would lose that time.<br>
+**As the ICS mutes the audio for ~3 seconds when skipping tracks, the songs would lose that time.<br>
 The last version also modifies the circuit for play/pause control. Now it puts the bluetooth in pause for that time, so the songs start correctly.**
 
 <a id="firmware"></a>
