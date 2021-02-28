@@ -27,8 +27,6 @@ Also, it will simulate the end of the tape instantly, and force the tape returni
 The tape controller returns to play state in approximately 1.2 seconds after the tape is simulated to reach its end.<br>
 If the user quickly pushes the same button again, the controller returns to play mode before this time has elapsed.<br> 
 This premature return to play state is detected, and an aditional pulse is generated for last button. So the tracks can be skipped pretty quick.<br>
-**As the ICS would mute for ~3 seconds, all the songs would lose that time.<br>
-Last version modifies the circuit, now it puts the bluetooth in pause for that time, so the songs start correctly.**
 
 The tape controller will detect a jam in the tape mechanism if more than 3 tracks are skipped quickly, so, to avoid that, an adittional 1.2 second delay is added after the 3rd fast skip.<br>
 This delay is only needed if the tape doesn't play for at least 2 seconds between a track change.<br>
@@ -50,6 +48,9 @@ To debug the state of the board, the led is used.<br>
 
 The firmware is implemented in a cheap STM32F103 "blue pill" board ($3).<br>
 The code doesn't use any special peripheral and can be very easily ported to other devices, all needed are some GPIOs and a timer to provide timing control.
+
+**As the ICS mutes the audio for ~3 seconds, when skippign tracks, all the songs would lose that time.<br>
+The last version also modifies the circuit for play/pause control. Now it puts the bluetooth in pause for that time, so the songs start correctly.**
 
 <a id="firmware"></a>
 ## Firmware
