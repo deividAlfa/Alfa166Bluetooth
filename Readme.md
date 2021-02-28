@@ -27,7 +27,7 @@ Also, it will simulate the end of the tape instantly, and force the tape returni
 The tape controller returns to play state in approximately 1.2 seconds after the tape is simulated to reach its end.<br>
 If the user quickly pushes the same button again, the controller returns to play mode before this time has elapsed.<br> 
 This premature return to play state is detected, and an aditional pulse is generated for last button. So the tracks can be skipped pretty quick.<br>
-#### Added play/pause: As the ICS would mute for ~3 seconds, all the songs would lose that time. Now it puts the bluetooth in pause for that time, so the songs start correctly.
+**As the ICS would mute for ~3 seconds, all the songs would lose that time. Modified circuit, now it puts the bluetooth in pause for that time, so the songs start correctly.**
 
 The tape controller will detect a jam in the tape mechanism if more than 3 tracks are skipped quickly, so, to avoid that, an adittional 1.2 second delay is added after the 3rd fast skip.<br>
 This delay is only needed if the tape doesn't play for at least 2 seconds between a track change.<br>
