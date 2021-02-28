@@ -126,7 +126,7 @@ The 5V and 8.5V points are only active when the ICS is on, so there's no need to
 
 8.5V were more than enough for my bluetooth module, althought it could handle 12V. Much more convenient!
  
- ![IMAGE](https://raw.githubusercontent.com/deividAlfa/Alfa166Bluetooth/master/Pictures/Connections.jpg)
+ ![IMAGE](https://raw.githubusercontent.com/deividAlfa/Alfa166Bluetooth/master/Pictures/Connection.jpg)
  
  
  
