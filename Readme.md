@@ -4,6 +4,7 @@
 
 * [Project description](#description)
 * [How to use](#use)
+* [Limitations](#limitations)
 * [Firmware](#firmware)
 * [Requirements](#requirements)
 * [Connection diagram](#connection)
@@ -55,10 +56,17 @@ The code doesn't use any special peripheral and can be very easily ported to oth
 
 <a id="use"></a>
 ## How to use
-
 - Connect to the bluetooth module and manually start playback in the phone.<br>
 - Set ICS in Tape mode.<br>
 - Now the music should be playing. Use the steering wheel or ICS controls to skip tracks.<br>
+
+<a id="limitations"></a>
+## Limitations
+The controller is unable to know if the song is playing, or the current song playback time.<br>
+Due that, it might stay in pause when skipping backwards.<br>
+In that case just skip forwards, wait for the song to start and skip backwards again.<br>
+The tape system is slow. If you skip very quick, it will miss some steps. Nothing to worry about<br>
+
 
 <a id="firmware"></a>
 ## Firmware
