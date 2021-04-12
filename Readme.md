@@ -17,28 +17,27 @@ https://youtu.be/hq1ijzfhlmo
 ## Project description
 The cassette (or tape) is nowadays something extinct and it's presence has no useful value.<br>
 The Alfa Romeo 166 ships with the ICS solution (Integrated Control System), which is a Siemens IDIS / Becker BE2569/2580/2582 (Also used in Porsche PCM1).<br>
-In embeds a tape slot and a external CD changer. Actually, bluetooth is almost mandatory to provide a complete experience.<br>
 Since the tape is not going to be used, it's a potential audio input that could be used for something else.<br>
 
-This firmware is the result of the reverse engineering of the tape mechanism: it emulates the tape presence, its states and sensors.<br>
-It's completely aware of the actual state, and can extract useful data from it, like sending pulses to a bluetooth module buttons.<br>
-When fast forward / fast rewind is selected, the firmware interprets this and generates a pulse to  NEXT or PREVIOUS track button.<br>
-Also, it will simulate the end of the tape instantly, and force the tape returning to play mode.<br>
-The tape controller returns to play state in approximately 1.2 seconds after the tape is simulated to reach its end.<br>
-If the user quickly pushes the same button again, the controller returns to play mode before this time has elapsed.<br> 
-This premature return to play state is detected, and an aditional pulse is generated for last button. So the tracks can be skipped pretty quick.<br>
-
-The tape controller will detect a jam in the tape mechanism if more than 3 tracks are skipped quickly, so, to avoid that, an adittional 1.2 second delay is added after the 3rd fast skip.<br>
-This delay is only needed if the tape doesn't play for at least 2 seconds between a track change.<br>
-You will notice that after the 3rd fast skip, the next one delays a bit more.<br>
-The counter is resetted after the delay or 2 seconds in play state.<br>
+This firmware fully emulates the tape presence, its states and sensors.<br>
 
 While in play mode, if the user pushes the "1-2" button (change tape play direction), this is detected and the CALL output is activated.<br>
 This is useful if your bluetooth module has hands-free function and button input to pick up or hang up a call.<br>
 
-To provide the best compatibility, a polarity input is provided. Leaving it open will set the polarity "Normally low", closing it will set it "Normally high".<br>
-Due the inmense number of bluetooth modules, working at different voltages (5, 3.3, 1.8V), the outputs that handle the pulses for the buttons are set as open-drain (They only pull to ground, but don't put voltage).<br>
-You will need to connect pull-up resistors to the working voltage of the bluetooth module. That way, any voltage level is compatible. STM32 handles max 5V, don't exceed that!
+To provide the best compatibility there are two adjustable options:
+	- Button polarity ("POL").
+		Open = Button idle state 0V (Low Level).
+		Closed = Button idle state VCC (High level).<br>
+		
+	- Auto resume ("AR"). Make a test on your phone. Start playing a song. Put in pause and then skip to the next song. Adjust as follows: 
+		Open = In pause state, cellphone doesn't resume playback automatically ater skipping tracks.<br>
+		Closed = In pause state, cellphone resumes playback automatically after skipping tracks.<br>
+
+The pins can be left floating (open) or connect to ground(closed).
+
+The outputs that handle the pulses for the buttons are set as open-drain (They only pull to ground, but don't put out voltage).<br>
+You will need to connect pull-up resistors to the working voltage of the bluetooth module.<br>
+This way, any voltage level is compatible. STM32 handles max 5V, don't exceed that!<br>
 
 To debug the state of the board, the led is used.<br>
 - Slow, heart beat-like blinks: The board is working but tape not active<br>
@@ -47,10 +46,9 @@ To debug the state of the board, the led is used.<br>
 
 
 The firmware is implemented in a cheap STM32F103 "blue pill" board ($3).<br>
-The code doesn't use any special peripheral and can be very easily ported to other devices, all needed are some GPIOs and a timer to provide timing control.
+The code doesn't use any special peripheral and can be very easily ported to other devices, all needed are some GPIOs and a timer to provide timing control.<br>
 
-**As the ICS mutes the audio for ~3 seconds when skipping tracks, the songs would lose that time.<br>
-The last version also modifies the circuit for play/pause control. Now it puts the bluetooth in pause for that time, so the songs start correctly.**
+** Latest update fixes compatibility issues with some phones **
 
 <a id="use"></a>
 ## How to use

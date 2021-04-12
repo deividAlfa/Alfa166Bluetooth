@@ -38,11 +38,13 @@
  *
  ************************************************************/
 
-enum{
-  pos_5V,														// No tape, all positions floating (Unused)
-  pos_2_5V,														// Tape in, also RWD and FF position. 6.8K resistor to GND, 2.5V
-  pos_1_2V,														// Transition from/to play position. 2.2K resistor to GND, 1.2V
+typedef enum{
+  reset_val=0,
+
   pos_0V,														// Play position. Signal direct to GND, 0V
+  pos_1_2V,														// Transition from/to play position. 2.2K resistor to GND, 1.2V
+  pos_2_5V,														// Tape in, also RWD and FF position. 6.8K resistor to GND, 2.5V
+  pos_5V,														// No tape, all positions floating (Unused)
 
   status_stop,													// In stop mode
   status_play,													// Playing
@@ -58,31 +60,33 @@ enum{
   btn_call,														// Call button
   btn_play_pause,
 
-};
+}status_t;
 
 
 // Struct for tape management
 typedef struct{
   volatile uint32_t 	delayPhotoTimer;						// Timer for photo sensor disable delay
-  volatile uint32_t 	playTimer;								// Time when the play started
+  volatile uint32_t 	playTimer;								// Time when the playback started
   volatile uint32_t 	freqPhotoTimer;							// Timer for photo sensor signal generation
   volatile uint32_t 	changedTimer;							// Timer for delay after skip tracks.
-  volatile uint32_t 	fastTimer;								// Timer To recognize if the tape returned to play mode by itself or if a button was pulsed again (add another pulse to the BT module)
+  volatile uint32_t 	skipTimer;								// Timer To recognize if the tape returned to play mode by itself or if a button was pulsed again (add another pulse to the BT module)
 
   volatile uint8_t		skipCnt;								// Counter for consecutive skips. More than 4 fast skips will make the tape think it's stuck. Wait longer this time.
-  volatile uint8_t 		playMode;								// Last known play mode
-  volatile uint32_t		btnTimer;
-  volatile uint8_t 		btnLast;								// Last pushed button
-  volatile uint8_t 		status;									// Actual status
+  volatile status_t		playMode;								// Last known play mode
+  volatile uint32_t		btnTimer;								// Timer used for buttons
+  volatile status_t		skipBtn;								// Stored skip track button
+  volatile status_t		status;									// Actual tape status
+  volatile status_t		BTstatus;								// Actual BT status
 
   volatile bool 		btnPushed;								// Flag to indicate a button was pushed (for reseting after timer expired timer)
   volatile bool			enablePhoto;							// Flag to enable or disable the photo sensor signal (For forcing RWD/FF modes to stop and resume and play mode)
   volatile bool 		polarity;								// Flag to set the button polarity depending on the POL_TAPE input (Normally low, normally high)
+  volatile bool			skipResume;								// Flag to indicate if the phone resumes playback after skipping a track (being n pause before)
 }tape_t;
 
 // Struct for tape position function
 typedef struct{
-	volatile uint8_t 	OutStatus;								// Actual analog position
+	volatile status_t 	OutLevel;								// Actual analog position
 	volatile uint32_t 	Timer;									// Timer for position transition delays
 	volatile uint8_t 	Status;									// For position state machine
 	volatile int8_t		Direction;								// Switching direction
@@ -93,12 +97,14 @@ typedef struct{
 #define positionDelay					(uint8_t)	100			// Delay before changing positions, to let the controller process the signal and turn on/off the position motor. Less than 80mS will randomly fail
 #define pulseDelay						(uint8_t)	10			// High/Low times for photo sensor signal generation (F = 50Hz)
 #define longPhotoDelay					(uint16_t)	1300		// Photo sensor long delay time (to prevent fault detection if too many fast skips)
-#define btnDelay						(uint8_t)	100			// Button pulsed time (Most modules will ignore shorter times)
+#define btnHighTime						(uint8_t)	100			// Button pulsed time (Most modules will ignore shorter times)
+#define btnLowTime						(uint8_t)	100			// Button pulsed time (Most modules will ignore shorter times)
 #define btnRepTim						(uint16_t)	1000		// Time limit to recognize repeated button presses (The controller reverts automatically to play mode in 1.2-1.3 seconds, so below 1 second it's safe)
 #define resetTimeOnPlay					(uint16_t)	2000		// Time in play mode to reset the fast skip counter
+#define resumeDelay						(uint16_t)	300			// After returning to playback state, time to wait before sending play pulse. If too fast the phobe might ignore it.
 
-#define MIN_POS							pos_2_5V				// Minimum position
-#define MAX_POS							pos_0V					// Maximum position
+#define MIN_POS							pos_0V				// Minimum position
+#define MAX_POS							pos_2_5V				// Maximum position
 #define MAX_FAST_SKIP					(uint8_t)	4			// Maximum fast skips before adding delay, to prevent fault detection
 
 #define H_Speed 						HAL_GPIO_ReadPin(H_SPEED_GPIO_Port, H_SPEED_Pin)
@@ -120,7 +126,7 @@ void initTape(void);
 void handleTape(void);
 void handlePosSensor(void);
 void handleLed(void);
-void setButton(uint8_t btn);
-void resetButtons(void);
+void setButton(status_t btn);
+void handleButtonReset(void);
 
 #endif /* INC_TAPE_H_ */

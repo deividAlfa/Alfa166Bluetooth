@@ -61,6 +61,10 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define LED_Pin GPIO_PIN_13
 #define LED_GPIO_Port GPIOC
+#define POLARITY_Pin GPIO_PIN_0
+#define POLARITY_GPIO_Port GPIOA
+#define RESUME_Pin GPIO_PIN_1
+#define RESUME_GPIO_Port GPIOA
 #define BTN_CALL_Pin GPIO_PIN_0
 #define BTN_CALL_GPIO_Port GPIOB
 #define BTN_PLAY_PAUSE_Pin GPIO_PIN_1
@@ -89,10 +93,6 @@ void Error_Handler(void);
 #define PHOTO_F_GPIO_Port GPIOB
 #define PHOTO_R_Pin GPIO_PIN_7
 #define PHOTO_R_GPIO_Port GPIOB
-#define POLARITY_Pin GPIO_PIN_8
-#define POLARITY_GPIO_Port GPIOB
-#define ALWAYS_HIGH_Pin GPIO_PIN_9
-#define ALWAYS_HIGH_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
