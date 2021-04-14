@@ -56,20 +56,20 @@ void handleTape(void){
           }
         }
         if(MT_Rev){
-          if(tape.playMode != revPlay){                                               // Tape direction changed while in play mode
+          if(tape.playMode!=revPlay){                                                 // Tape direction changed while in play mode
             setButton(btn_call);                                                      // Press call button
           }
-          tape.playMode    = revPlay;                                                 // Update play mode (reverse)
+          tape.playMode = revPlay;                                                    // Update play mode (reverse)
         }
         else if(MT_Fwd){
           if(tape.playMode != fwdPlay){                                               // Tape direction changed while in play mode
             setButton(btn_call);
           }
-          tape.playMode    = fwdPlay;                                                 // Update play mode (forward)
+          tape.playMode = fwdPlay;                                                    // Update play mode (forward)
         }
       }
       else{                                                                           // Wasn't in play mode before?
-        tape.enablePhoto    = 1;                                                      // Enable photo sensor
+        tape.enablePhoto = 1;                                                         // Enable photo sensor
         if( (tape.status==status_ffwd) || (tape.status==status_frwd) ){               // Was in a fast mode before?
           if((currentTime-tape.skipTimer) < btnRepTim){                               // Check the timer, if it's low, the user exited fast mode by pushing the button again (Repeat button push)
             tape.skipTimer = 0;                                                       // Clear timer to avoid setting repeat again
@@ -100,10 +100,10 @@ void handleTape(void){
     else{                                                                             // In high speed mode (Fast Rewind or Fast Forward)
       if(MT_Fwd^MT_Rev){                                                              // What direction?
     	  if( (tape.status!=status_frwd) && (tape.status!=status_ffwd) ){               // Wasn't in Fast mode before?
-          tape.repeatSkip       = 0;                                                  // Reset repeat state
+          tape.repeatSkip = 0;                                                        // Reset repeat state
           tape.skipCnt++;                                                             // Increase skipped track count
-          tape.delayPhotoTimer  = currentTime;                                        // Update photo sensor disable timer
-          tape.skipTimer        = currentTime;                                        // Update skip timer
+          tape.delayPhotoTimer = currentTime;                                         // Update photo sensor disable timer
+          tape.skipTimer = currentTime;                                               // Update skip timer
 
           if(MT_Fwd){                                                                 // Tape mechanism in Fast Forward mode
             if(tape.playMode==revPlay){                                               // Was playing in reverse mode?
@@ -111,19 +111,19 @@ void handleTape(void){
               tape.skipBtn = btn_prev;                                                // Send pulse to previous track button
             }
             if(tape.playMode==fwdPlay){                                               // Was playing in forward mode?
-              tape.status    = status_ffwd;                                           // Now we are in fast forward
-              tape.skipBtn     = btn_next;                                            // Send pulse to next track button
+              tape.status = status_ffwd;                                              // Now we are in fast forward
+              tape.skipBtn = btn_next;                                                // Send pulse to next track button
             }
           }
 
           if(MT_Rev){                                                                 // Tape mechanism in Fast Rewind mode
             if(tape.playMode==revPlay){                                               // Was playing in reverse mode?
               tape.status=status_ffwd;                                                // Now we are in fast forward
-              tape.skipBtn     = btn_next;                                            // Send pulse to next track button
+              tape.skipBtn = btn_next;                                                // Send pulse to next track button
             }
             if(tape.playMode==fwdPlay){                                               // Was playing in forward mode?
               tape.status=status_frwd;                                                // Now we are in fast rewind
-              tape.skipBtn     = btn_prev;                                            // Send pulse to previous track button
+              tape.skipBtn = btn_prev;                                                // Send pulse to previous track button
             }
           }
           tape.BTstatus=status_pause;
