@@ -58,7 +58,7 @@ typedef enum{
   btn_next,                                     // Next track button
   btn_prev,                                     // Previous track button
   btn_call,                                     // Call button
-  btn_play_pause,
+  btn_play_pause,                               // Play-Pause button
 
 }status_t;
 
