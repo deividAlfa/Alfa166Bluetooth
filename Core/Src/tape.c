@@ -11,7 +11,7 @@
   position_t  pos;
 
 void initTape(void){
-  tape.status     = status_stop;                                                        // Initial tape state stop
+  tape.status     = status_stop;                                                      // Initial tape state stop
   tape.BTstatus   = status_play;                                                      // Assume BT is playing
   pos.OutLevel    = pos_2_5V;                                                         // Default analog status = Tape inside
   pos.Status      = 0;                                                                // First state
