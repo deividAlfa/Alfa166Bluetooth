@@ -16,7 +16,7 @@ void initTape(void){
   pos.OutLevel    = pos_2_5V;                                                         // Default analog status = Tape inside
   pos.Status      = 0;                                                                // First state
   pos.Direction   = 1;                                                                // Initial position changing direction
-  tape.polarity   = !HAL_GPIO_ReadPin(POLARITY_GPIO_Port, POLARITY_Pin);
+  tape.polarity   = !HAL_GPIO_ReadPin(POLARITY_GPIO_Port, POLARITY_Pin);              // Read polarity before resetting the buttons
 
   HAL_GPIO_WritePin(BTN_PREV_GPIO_Port,BTN_PREV_Pin,tape.polarity);                   // Reset all buttons
   HAL_GPIO_WritePin(BTN_NEXT_GPIO_Port,BTN_NEXT_Pin,tape.polarity);
@@ -28,6 +28,7 @@ void handleTape(void){
   uint32_t currentTime = HAL_GetTick();
   tape.polarity    = !HAL_GPIO_ReadPin(POLARITY_GPIO_Port, POLARITY_Pin);             // Update button polarity (So it can be changed on the fly)
   tape.skipResume = HAL_GPIO_ReadPin(RESUME_GPIO_Port, RESUME_Pin);                   // Update skip resume status (So it can be changed on the fly)
+
   handlePosSensor();                                                                  // Handle position sensor
 
   /*********************************************************************************************************************
@@ -134,16 +135,16 @@ void handleTape(void){
   if((tape.status==status_frwd) || (tape.status==status_ffwd)){                       // If in fast mode (Fast rewind or Fast forward)
     if(tape.skipCnt>=MAX_FAST_SKIP){                                                  // Check we didn't skip more than 3 tracks in quick mode
       if((currentTime-tape.delayPhotoTimer)>longPhotoDelay){                          // Otherwise wait the delay to avoid tape error triggering (Or tape controller will think the  tape is stuck)
-        tape.skipCnt    = 0;                                                          // Once the delay is done, Reset count
+        tape.skipCnt = 0;                                                             // Once the delay is done, Reset count
       }
     }
     else{                                                                             // If less than 3 consecutively skipped tracks, no delay applied
-      tape.enablePhoto    = 0;                                                        // Disable photo sensor pulses to simulate end of tape (back to play mode)
+      tape.enablePhoto = 0;                                                           // Disable photo sensor pulses to simulate end of tape (back to play mode)
     }
   }
   if(tape.skipCnt){                                                                   // If there's any value in the skipped track counter
     if((tape.status==status_play) && (currentTime-tape.playTimer)>resetTimeOnPlay){   // If in play mode for more than 2 seconds
-      tape.skipCnt        = 0;                                                        // Reset the counter
+      tape.skipCnt = 0;                                                               // Reset the counter
     }
   }
   if(tape.btnPushed){                                                                 // If any button active
@@ -168,37 +169,37 @@ void handlePosSensor(void){
   if(L_Plus ^ L_Minus ){                                                              // Only L+ =1 or L- =1. this means tape position is moving
     switch(pos.Status){                                                               // Switch internal state
       case 0:                                                                         // Status 0, Load position Delay
-        pos.Timer    = currentTime;                                                   // Load timer
-        pos.Status    = 1;                                                            // Set status 1
+        pos.Timer = currentTime;                                                      // Load timer
+        pos.Status = 1;                                                               // Set status 1
         break;
 
       case 1:                                                                         // Status 1, wait position Delay to let the controller process the status and turn on/off the position motor
         if((currentTime-pos.Timer)>positionDelay){                                    // If position Delay time elapsed
-          pos.Status    = 2;                                                          // Set Status 2
+          pos.Status = 2;                                                             // Set Status 2
         }
         break;
 
       case 2:                                                                         // Status 2, change position
         pos.OutLevel += pos.Direction;                                                // Change position (will add or subtract 1 to the position depending on the direction)
         if(pos.OutLevel<=MIN_POS){                                                    // If reached maximum position
-          pos.Direction    = 1;                                                       // Reverse direction
+          pos.Direction = 1;                                                          // Reverse direction
 
         }
         if(pos.OutLevel>=MAX_POS){                                                    // If reached minimum position
-          pos.Direction    = -1;                                                      // Reverse direction
+          pos.Direction = -1;                                                         // Reverse direction
         }
-        pos.Status    = 0;                                                            // Set Status 0, restart the cycle
+        pos.Status = 0;                                                               // Set Status 0, restart the cycle
         break;
 
       default:                                                                        // We shouldn't get here
-        pos.Status    = 0;                                                            // If this happens, set the default state
+        pos.Status = 0;                                                               // If this happens, set the default state
         break;
     }
   }
   if(!tape.btnPushed && !L_Plus && !L_Minus && (tape.status!=status_stop) ){          // L+ =0 and L- =0, this means tape disabled (ICS not in Tape mode)
-    pos.OutLevel      = pos_2_5V;                                                     // Reset everything
-    tape.enablePhoto  = 1;
-    tape.status       = status_stop;
+    pos.OutLevel = pos_2_5V;                                                          // Reset everything
+    tape.enablePhoto = 1;
+    tape.status = status_stop;
   }
 
 /*********************************************************************************************************************
@@ -230,13 +231,13 @@ void handlePosSensor(void){
       break;
 
     default:
-      pos.OutLevel    = pos_2_5V;
+      pos.OutLevel = pos_2_5V;                                                        // By default set 2.5V state (Tape inserted)
   }
 }
 
 void setButton(status_t btn){
-  tape.btnPushed    = 1;                                                              // Set flag
-  tape.btnTimer    = HAL_GetTick();                                                   // Load timer
+  tape.btnPushed = 1;                                                                 // Set flag
+  tape.btnTimer = HAL_GetTick();                                                      // Load timer
 
   switch(btn){                                                                        // Find what button to enable
     case btn_prev:                                                                    // Previous track button
@@ -268,11 +269,11 @@ void setButton(status_t btn){
 void handleButtonReset(void){
   enum{
 	  status_isHigh,
-      status_isLow
+	  status_isLow
   };
-  static uint8_t status=status_isHigh;
-  uint32_t currentTime=HAL_GetTick();
-  uint8_t OldStatus=status;
+  static uint8_t status = status_isHigh;
+  uint32_t currentTime  = HAL_GetTick();
+  uint8_t OldStatus     = status;
 
   if(status==status_isHigh){                                                          // Button is already high
     if((currentTime-tape.btnTimer)>btnHighTime){                                      // If enough time in high state
@@ -280,12 +281,12 @@ void handleButtonReset(void){
       HAL_GPIO_WritePin(BTN_NEXT_GPIO_Port,BTN_NEXT_Pin,tape.polarity);
       HAL_GPIO_WritePin(BTN_CALL_GPIO_Port,BTN_CALL_Pin,tape.polarity);
       HAL_GPIO_WritePin(BTN_PLAY_PAUSE_GPIO_Port,BTN_PLAY_PAUSE_Pin,tape.polarity);
-      status=status_isLow;                                                            // Set status = low
+      status = status_isLow;                                                          // Set status = low
     }
   }
   else if((currentTime-tape.btnTimer)>btnLowTime){                                    // If enough time in low state
-    status=status_isHigh;                                                             // reset state
-    tape.btnPushed    = 0;                                                            // Reset flag
+    status = status_isHigh;                                                           // reset state
+    tape.btnPushed = 0;                                                               // Reset flag
   }
   if(OldStatus!=status){                                                              // If status changes
     tape.btnTimer = currentTime;                                                      // Update time
@@ -293,8 +294,8 @@ void handleButtonReset(void){
 }
 
 void handleLed(void){
-  static uint32_t time    = 0;                                                        // Internal variable for timing the blinking times, only initial state = 0
-  uint32_t currentTime=HAL_GetTick();
+  static uint32_t time = 0;                                                           // Internal variable for timing the blinking times, only initial state = 0
+  uint32_t currentTime = HAL_GetTick();
 
   if(tape.status!=status_stop){                                                       // If not in stop mode
     if(tape.status!=status_play){                                                     // If not in play mode
@@ -303,7 +304,7 @@ void handleLed(void){
     else if(tape.status==status_play){                                                // We are in play mode,quick led blinking
       if(currentTime-time>50){                                                        // If time elapsed > 50mS
         HAL_GPIO_TogglePin(LED_GPIO_Port,LED_Pin);                                    // Toggle LED GPIO
-        time    = currentTime;                                                        // Load timer
+        time = currentTime;                                                           // Load timer
       }
     }
   }
@@ -311,13 +312,13 @@ void handleLed(void){
     if(!HAL_GPIO_ReadPin(LED_GPIO_Port,LED_Pin)){                                     // Read LED status, if 0 (LED on)
       if(currentTime-time>20){                                                        // If time elapsed > 20mS
         HAL_GPIO_WritePin(LED_GPIO_Port,LED_Pin, SET);                                // Turn the LED off
-        time    = currentTime;                                                        // Load timer
+        time = currentTime;                                                           // Load timer
       }
     }
     else{                                                                             // If LED off
       if(currentTime-time>1000){                                                      // If time elapsed > 1000mS
         HAL_GPIO_WritePin(LED_GPIO_Port,LED_Pin, RESET);                              // Turn the LED on
-        time    = currentTime;                                                        // Load timer
+        time = currentTime;                                                           // Load timer
       }
     }
   }
