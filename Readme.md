@@ -53,7 +53,8 @@ To debug the state of the board, the led is used.<br>
 
 
 The firmware is implemented in a cheap STM32F103 "blue pill" board ($3).<br>
-The code doesn't use any special peripheral and can be very easily ported to other devices, all needed are some GPIOs and a timer to provide timing control.<br>
+The code doesn't use any special peripheral and can be very easily ported to other devices.<br>
+All needed are some GPIOs and a timer to provide timing control.<br>
 
 <a id="use"></a>
 ## How to use
