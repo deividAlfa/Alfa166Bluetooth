@@ -11,7 +11,7 @@
 
 <!-- /MarkdownTOC -->
 
-** Latest update fixes compatibility issues with some phones! **
+**Latest update fixes compatibility issues with some phones!**
 
 Video:
 https://youtu.be/hq1ijzfhlmo
