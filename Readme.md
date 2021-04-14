@@ -11,6 +11,8 @@
 
 <!-- /MarkdownTOC -->
 
+** Latest update fixes compatibility issues with some phones! **
+
 Video:
 https://youtu.be/hq1ijzfhlmo
 
@@ -50,8 +52,6 @@ To debug the state of the board, the led is used.<br>
 
 The firmware is implemented in a cheap STM32F103 "blue pill" board ($3).<br>
 The code doesn't use any special peripheral and can be very easily ported to other devices, all needed are some GPIOs and a timer to provide timing control.<br>
-
-** Latest update fixes compatibility issues with some phones **
 
 <a id="use"></a>
 ## How to use
