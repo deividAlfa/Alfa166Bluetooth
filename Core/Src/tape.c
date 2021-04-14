@@ -99,7 +99,7 @@ void handleTape(void){
     }
     else{                                                                             // In high speed mode (Fast Rewind or Fast Forward)
       if(MT_Fwd^MT_Rev){                                                              // What direction?
-    	  if( (tape.status!=status_frwd) && (tape.status!=status_ffwd) ){               // Wasn't in Fast mode before?
+        if( (tape.status!=status_frwd) && (tape.status!=status_ffwd) ){               // Wasn't in Fast mode before?
           tape.repeatSkip = 0;                                                        // Reset repeat state
           tape.skipCnt++;                                                             // Increase skipped track count
           tape.delayPhotoTimer = currentTime;                                         // Update photo sensor disable timer
