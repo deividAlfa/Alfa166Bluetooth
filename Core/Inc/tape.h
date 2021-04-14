@@ -20,7 +20,8 @@
  * 		H_SPEED			INPUT			NO PULL
  * 		L_plus 			INPUT			NO PULL
  * 		L_minus			INPUT			NO PULL
- * 		POLARITY		INPUT			PULL DOWN
+ * 		POLARITY		INPUT			PULL UP
+ * 		RESUME			INPUT			PULL UP
  *
  * 		POS_0V			OUTPUT			OPEN DRAIN
  * 		POS_1_2V		OUTPUT			OPEN DRAIN
@@ -30,7 +31,6 @@
  * 		BTN_PREV		OUTPUT			OPEN DRAIN
  * 		BTN_NEXT		OUTPUT			OPEN DRAIN
  * 		BTN_CALL		OUTPUT			OPEN DRAIN
- * 		ALWAYS_HIGH		OUTPUT			PUSH-PULL
  *
  *		Be careful! If the outputs are not set as open drain, the pin will output 3.3V when high
  *		This might damage the bluetooth module if it works at a lower voltage, ex. 1.8V
@@ -82,6 +82,7 @@ typedef struct{
   volatile bool			enablePhoto;							// Flag to enable or disable the photo sensor signal (For forcing RWD/FF modes to stop and resume and play mode)
   volatile bool 		polarity;								// Flag to set the button polarity depending on the POL_TAPE input (Normally low, normally high)
   volatile bool			skipResume;								// Flag to indicate if the phone resumes playback after skipping a track (being n pause before)
+  volatile bool			repeatSkip;								// Flag to indicate there's a repeat pending
 }tape_t;
 
 // Struct for tape position function
@@ -92,18 +93,18 @@ typedef struct{
 	volatile int8_t		Direction;								// Switching direction
 }position_t;
 
-// Pretty critical timings. Extensively tested, lower times can cause ocassional failures
+// Pretty critical timings. Extensively tested, different times will probably cause malfunctioning
 																// Delays in mS
-#define positionDelay					(uint8_t)	100			// Delay before changing positions, to let the controller process the signal and turn on/off the position motor. Less than 80mS will randomly fail
-#define pulseDelay						(uint8_t)	10			// High/Low times for photo sensor signal generation (F = 50Hz)
-#define longPhotoDelay					(uint16_t)	1300		// Photo sensor long delay time (to prevent fault detection if too many fast skips)
-#define btnHighTime						(uint8_t)	100			// Button pulsed time (Most modules will ignore shorter times)
-#define btnLowTime						(uint8_t)	100			// Button pulsed time (Most modules will ignore shorter times)
-#define btnRepTim						(uint16_t)	1000		// Time limit to recognize repeated button presses (The controller reverts automatically to play mode in 1.2-1.3 seconds, so below 1 second it's safe)
-#define resetTimeOnPlay					(uint16_t)	2000		// Time in play mode to reset the fast skip counter
-#define resumeDelay						(uint16_t)	300			// After returning to playback state, time to wait before sending play pulse. If too fast the phobe might ignore it.
+#define positionDelay					100						// Delay before changing positions, to let the controller process the signal and turn on/off the position motor. Less than 80mS will randomly fail
+#define pulseDelay						10						// High/Low times for photo sensor signal generation (F = 50Hz)
+#define longPhotoDelay					1300					// Photo sensor long delay time (to prevent fault detection if too many fast skips)
+#define btnHighTime						100						// Button pulsed time (Most modules will ignore shorter times)
+#define btnLowTime						200						// Button pulsed time, used to ensure enough time between button presses (Most modules will ignore shorter times)
+#define btnRepTim						1200					// Time limit to recognize repeated button presses (The controller reverts automatically to play mode in 1.2-1.3 seconds, so below 1 second it's safe)
+#define resetTimeOnPlay					2000					// Time in play mode to reset the fast skip counter
+#define resumeDelay						300						// After returning to playback state, time to wait before sending play pulse. If too fast the phobe might ignore it.
 
-#define MIN_POS							pos_0V				// Minimum position
+#define MIN_POS							pos_0V					// Minimum position
 #define MAX_POS							pos_2_5V				// Maximum position
 #define MAX_FAST_SKIP					(uint8_t)	4			// Maximum fast skips before adding delay, to prevent fault detection
 
