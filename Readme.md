@@ -14,7 +14,8 @@
 **Latest update fixes compatibility issues with some phones!**
 
 Video:
-https://youtu.be/hq1ijzfhlmo
+[![IMAGE ALT TEXT](https://img.youtube.com/vi/hq1ijzfhlmo/0.jpg)](https://youtu.be/hq1ijzfhlmo "Alfa romeo 166 tape emulator")
+
 
 <a id="description"></a>
 ## Project description
