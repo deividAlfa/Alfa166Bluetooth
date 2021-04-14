@@ -69,7 +69,7 @@ In that case just skip forwards, wait for the song to start and skip backwards a
 The tape system is slow. If you skip very quick, it will miss some steps. Nothing to worry about.<br>
 
 Some phones or bluetooh modules won't like pressing the buttons too fast.<br>
-If you have issues with the fastest (200mS), then try slower options (400, 600, 800, 1000mS).
+If you have issues with the fastest (200mS), then try slower options (400, 600, 800, 1000mS).<br>
 If it always fail when quickly pressing ICS buttons, and none of the builds fixes it, it means the phone or bluetooth module can't take two consecutive next/prev pulses.<br>
 Use NoRepeat build in that case.<br>
 
