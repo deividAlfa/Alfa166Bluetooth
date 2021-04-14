@@ -26,7 +26,7 @@ void initTape(void){
 
 void handleTape(void){
   uint32_t currentTime = HAL_GetTick();
-  tape.polarity    = !HAL_GPIO_ReadPin(POLARITY_GPIO_Port, POLARITY_Pin);             // Update button polarity (So it can be changed on the fly)
+  tape.polarity = !HAL_GPIO_ReadPin(POLARITY_GPIO_Port, POLARITY_Pin);                // Update button polarity (So it can be changed on the fly)
   tape.skipResume = HAL_GPIO_ReadPin(RESUME_GPIO_Port, RESUME_Pin);                   // Update skip resume status (So it can be changed on the fly)
 
   handlePosSensor();                                                                  // Handle position sensor
