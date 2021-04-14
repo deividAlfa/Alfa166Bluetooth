@@ -208,24 +208,24 @@ void handlePosSensor(void){
  *********************************************************************************************************************/
   switch(pos.OutLevel){                                                               // Set the analog position ("POS. SEN" pin)
     case pos_5V:
-      HAL_GPIO_WritePin(POS_2_5_GPIO_Port,POS_2_5_Pin,SET);                             // All the pins floating
+      HAL_GPIO_WritePin(POS_2_5_GPIO_Port,POS_2_5_Pin,SET);                           // All the pins floating
       HAL_GPIO_WritePin(POS_1_2_GPIO_Port,POS_1_2_Pin,SET);
       HAL_GPIO_WritePin(POS_0_GPIO_Port,POS_0_Pin,SET);
       break;
 
-    case pos_2_5V:                                                                      // 6.8K resistor to ground
+    case pos_2_5V:                                                                    // 6.8K resistor to ground
       HAL_GPIO_WritePin(POS_2_5_GPIO_Port,POS_2_5_Pin,RESET);
       HAL_GPIO_WritePin(POS_1_2_GPIO_Port,POS_1_2_Pin,SET);
       HAL_GPIO_WritePin(POS_0_GPIO_Port,POS_0_Pin,SET);
       break;
 
-    case pos_1_2V:                                                                      // 2.2K resistor to ground
+    case pos_1_2V:                                                                    // 2.2K resistor to ground
       HAL_GPIO_WritePin(POS_2_5_GPIO_Port,POS_2_5_Pin,SET);
       HAL_GPIO_WritePin(POS_1_2_GPIO_Port,POS_1_2_Pin,RESET);
       HAL_GPIO_WritePin(POS_0_GPIO_Port,POS_0_Pin,SET);
       break;
 
-    case pos_0V:                                                                        // Direct to ground (Doesn't matter the others)
+    case pos_0V:                                                                      // Direct to ground (Doesn't matter the others)
       HAL_GPIO_WritePin(POS_0_GPIO_Port,POS_0_Pin,RESET);
       break;
 
@@ -239,24 +239,24 @@ void setButton(status_t btn){
   tape.btnTimer    = HAL_GetTick();                                                   // Load timer
 
   switch(btn){                                                                        // Find what button to enable
-    case btn_prev:                                                                      // Previous track button
-      HAL_GPIO_WritePin(BTN_PREV_GPIO_Port,BTN_PREV_Pin,!tape.polarity);                // Set output depending on the polarity
+    case btn_prev:                                                                    // Previous track button
+      HAL_GPIO_WritePin(BTN_PREV_GPIO_Port,BTN_PREV_Pin,!tape.polarity);              // Set output depending on the polarity
       break;
 
-    case btn_next:                                                                      // Next track button
-      HAL_GPIO_WritePin(BTN_NEXT_GPIO_Port,BTN_NEXT_Pin,!tape.polarity);                // Set output depending on the polarity
+    case btn_next:                                                                    // Next track button
+      HAL_GPIO_WritePin(BTN_NEXT_GPIO_Port,BTN_NEXT_Pin,!tape.polarity);              // Set output depending on the polarity
       break;
 
-    case btn_call:                                                                      // Call button
-      HAL_GPIO_WritePin(BTN_CALL_GPIO_Port,BTN_CALL_Pin,!tape.polarity);                // Set output depending on the polarity
+    case btn_call:                                                                    // Call button
+      HAL_GPIO_WritePin(BTN_CALL_GPIO_Port,BTN_CALL_Pin,!tape.polarity);              // Set output depending on the polarity
       break;
 
-    case btn_play_pause:                                                                // Play/pause button
-      HAL_GPIO_WritePin(BTN_PLAY_PAUSE_GPIO_Port,BTN_PLAY_PAUSE_Pin,!tape.polarity);    // Set output depending on the polarity
+    case btn_play_pause:                                                              // Play/pause button
+      HAL_GPIO_WritePin(BTN_PLAY_PAUSE_GPIO_Port,BTN_PLAY_PAUSE_Pin,!tape.polarity);  // Set output depending on the polarity
       break;
 
-    default:                                                                            // We shouldn't get any unknown value
-      HAL_GPIO_WritePin(BTN_PREV_GPIO_Port,BTN_PREV_Pin,tape.polarity);                 // If this happens,clear all the buttons
+    default:                                                                          // We shouldn't get any unknown value
+      HAL_GPIO_WritePin(BTN_PREV_GPIO_Port,BTN_PREV_Pin,tape.polarity);               // If this happens,clear all the buttons
       HAL_GPIO_WritePin(BTN_NEXT_GPIO_Port,BTN_NEXT_Pin,tape.polarity);
       HAL_GPIO_WritePin(BTN_CALL_GPIO_Port,BTN_CALL_Pin,tape.polarity);
       HAL_GPIO_WritePin(BTN_PLAY_PAUSE_GPIO_Port,BTN_PLAY_PAUSE_Pin,tape.polarity);
