@@ -76,7 +76,7 @@ void handleTape(void){
 					if( (tape.status==status_ffwd) || (tape.status==status_frwd) ){			// Was in a fast mode before?
 						if((currentTime-tape.skipTimer) < btnRepTim){						// Check the timer, if it's low, the user exited fast mode by pushing the button again (Repeat button push)
 							tape.skipTimer = 0;												// Clear timer to avoid setting repeat again
-							tape.repeatSkip = 0;											// Enable repeat
+							tape.repeatSkip = 1;											// Enable repeat
 						}
 
 						if(tape.skipBtn==btn_prev){											// Previous track button was pushed
