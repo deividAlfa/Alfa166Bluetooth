@@ -11,10 +11,11 @@
 
 <!-- /MarkdownTOC -->
 
-**Latest update fixes compatibility issues with some phones!**
+**Latest update fixes compatibility issues with some phones!**<br>
 
-Video:
-[![IMAGE ALT TEXT](https://img.youtube.com/vi/hq1ijzfhlmo/0.jpg)](https://youtu.be/hq1ijzfhlmo "Alfa romeo 166 tape emulator")
+**Video:**<br>
+
+[![IMAGE ALT TEXT](https://img.youtube.com/vi/hq1ijzfhlmo/0.jpg)](https://youtu.be/hq1ijzfhlmo "Alfa romeo 166 tape emulator")<br>
 
 
 <a id="description"></a>
