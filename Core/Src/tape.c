@@ -22,6 +22,7 @@ void initTape(void){
   HAL_GPIO_WritePin(BTN_NEXT_GPIO_Port,BTN_NEXT_Pin,tape.polarity);
   HAL_GPIO_WritePin(BTN_CALL_GPIO_Port,BTN_CALL_Pin,tape.polarity);
   HAL_GPIO_WritePin(BTN_PLAY_PAUSE_GPIO_Port,BTN_PLAY_PAUSE_Pin,tape.polarity);
+  HAL_GPIO_WritePin(BTN_PLAY_PAUSE_CALL_GPIO_Port,BTN_PLAY_PAUSE_CALL_Pin,tape.polarity);
 }
 
 void handleTape(void){
@@ -74,7 +75,7 @@ void handleTape(void){
         if( (tape.status==status_ffwd) || (tape.status==status_frwd) ){               // Was in a fast mode before?
           if((currentTime-tape.skipTimer) < btnRepTim){                               // Check the timer, if it's low, the user exited fast mode by pushing the button again (Repeat button push)
             tape.skipTimer = 0;                                                       // Clear timer to avoid setting repeat again
-            tape.repeatSkip = 0;                                                      // Enable repeat
+            tape.repeatSkip = EnableRepeat;                                           // Enable repeat
           }
 
           if(tape.skipBtn==btn_prev){                                                 // Previous track button was pushed
@@ -136,8 +137,10 @@ void handleTape(void){
               tape.skipBtn = btn_prev;                                                // Send pulse to previous track button
             }
           }
-          tape.BTstatus=status_pause;
-          setButton(btn_play_pause);                                                  // Pause now
+          if(tape.BTstatus!=status_pause){                                            // If not in pause
+            tape.BTstatus=status_pause;
+            setButton(btn_play_pause);                                                // Pause now
+          }
     	  }
     	}
     }
@@ -279,6 +282,7 @@ void setButton(status_t btn){
       HAL_GPIO_WritePin(BTN_NEXT_GPIO_Port,BTN_NEXT_Pin,tape.polarity);
       HAL_GPIO_WritePin(BTN_CALL_GPIO_Port,BTN_CALL_Pin,tape.polarity);
       HAL_GPIO_WritePin(BTN_PLAY_PAUSE_GPIO_Port,BTN_PLAY_PAUSE_Pin,tape.polarity);
+      HAL_GPIO_WritePin(BTN_PLAY_PAUSE_CALL_GPIO_Port,BTN_PLAY_PAUSE_CALL_Pin,tape.polarity);
       tape.btnPushed = 0;
       break;
   }
@@ -299,6 +303,7 @@ void handleButtonReset(void){
       HAL_GPIO_WritePin(BTN_NEXT_GPIO_Port,BTN_NEXT_Pin,tape.polarity);
       HAL_GPIO_WritePin(BTN_CALL_GPIO_Port,BTN_CALL_Pin,tape.polarity);
       HAL_GPIO_WritePin(BTN_PLAY_PAUSE_GPIO_Port,BTN_PLAY_PAUSE_Pin,tape.polarity);
+      HAL_GPIO_WritePin(BTN_PLAY_PAUSE_CALL_GPIO_Port,BTN_PLAY_PAUSE_CALL_Pin,tape.polarity);
       status = status_isLow;                                                          // Set status = low
     }
   }

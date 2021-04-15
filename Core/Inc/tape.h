@@ -125,6 +125,7 @@ volatile int8_t             Direction;          // Switching direction
 #define setPos_0vHigh()     HAL_GPIO_WritePin(POS_0_GPIO_Port,POS_0_Pin,SET)
 #define setPos_0vLow()      HAL_GPIO_WritePin(POS_0_GPIO_Port,POS_0_Pin,RESET)
 
+#define EnableRepeat        1
 
 void initTape(void);
 void handleTape(void);
