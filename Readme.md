@@ -51,9 +51,7 @@ The pins can be left floating (open) or connect to ground (closed).<br>
 	
 There is an additional pin, **Play-pause-call** output.<br>
   Some bluetooth modules use play button for all functions.<br>
-  In that case, use this output instead CALL or PLAY-PAUSE.<br>
-  If your module doesn't have call feature, connecting this would also enable to use the 1-2 ICS button as play/pause.<br>
-  
+  In that case, use this output instead CALL or PLAY-PAUSE.<br> 
   
   
 Some phones or bluetooth modules don't like pressing the buttons too fast.<br>
