@@ -30,11 +30,11 @@ While in play mode, if the user pushes the "1-2" button (change tape play direct
 This is useful if your bluetooth module has hands-free function and button input to pick up or hang up a call.<br>
 
 To provide the best compatibility there are some adjustable options:
-* Button polarity ("**POL**").<br>
+* **POL** (Button polarity).<br>
 	Open = Button idle state 0V (Low Level).<br>
 	Closed = Button idle state VCC (High level).<br>
       
-* Auto resume ("**AR**").<br>
+* **AR** (Auto resume).<br>
   Make a test on your phone: Start playing a song. Put in pause and then skip to the next song.<br>
   Adjust as follows:<br>
   Open = In pause state, cellphone resumes playback automatically after skipping tracks.<br>
