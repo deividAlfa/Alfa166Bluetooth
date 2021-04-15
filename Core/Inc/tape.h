@@ -84,6 +84,7 @@ typedef struct{
   volatile bool             enablePhoto;        // Flag to enable or disable the photo sensor signal (For forcing RWD/FF modes to stop and resume and play mode)
   volatile bool             polarity;           // Flag to set the button polarity depending on the POL_TAPE input (Normally low, normally high)
   volatile bool             skipResume;         // Flag to indicate if the phone resumes playback after skipping a track (being n pause before)
+  volatile bool             callOrPause;        // Flag to indicate the use of 1-2 button. As pause/resume or call output.
   volatile bool             repeatSkip;         // Flag to indicate there's a repeat pending
 }tape_t;
 
@@ -96,17 +97,19 @@ volatile int8_t             Direction;          // Switching direction
 }position_t;
 
 // Extensively tested, different times will probably cause malfunctioning
-// Pretty critical timings!
-                                                // Delays in mS
+// Pretty critical timings! Delays in mS
+
 #define positionDelay       100                 // Delay before changing positions, to let the controller process the signal and turn on/off the position motor. Less than 80mS will randomly fail
-#define pulseDelay          10                  // High/Low times for photo sensor signal generation (F = 50Hz)
+#define pulseDelay          10                  // High/low times for photo sensor signal generation (F = 50Hz)
 #define longPhotoDelay      1300                // Photo sensor long delay time (to prevent fault detection if too many fast skips)
-#define btnHighTime         100                 // Button pulsed time (Most modules will ignore shorter times)
-#define btnLowTime          200                 // Button pulsed time, used to ensure enough time between button presses (Most modules will ignore shorter times)
-#define btnRepTim           1200                // Time limit to recognize repeated button presses (The controller reverts automatically to play mode in 1.2-1.3 seconds, so below 1 second it's safe)
-#define resetTimeOnPlay     2000                // Time in play mode to reset the fast skip counter
-#define resumeDelay         300                 // After returning to playback state, time to wait before sending play pulse. If too fast the phobe might ignore it.
-#define stopDelay           50                  // Time in stop mode to actually set stop status
+#define btnHighTime         100                 // Button active time (Most modules will ignore shorter times)
+#define btnLowTime          400                 // Button idle time, to ensure enough time between button presses
+#define btnRepTimHigh       1200                // Max time after returning to play state to recognize repeated button presses (The controller reverts automatically to play mode in 1.3 seconds)
+#define btnRepTimLow        10                  // Min time to recognize repeated button presses
+#define resetTimeOnPlay     2000                // Time in play state to reset the fast skip counter
+#define resumeDelay         300                 // After returning to playback state, time to wait before sending play pulse. If too fast the phone might ignore it.
+#define stopDelay           50                  // Min time in stop mode to actually set stop status
+#define delay1_2            100                 // Min time in play mode to read 1-2 button (to avoid noises)
 
 #define MIN_POS             pos_0V              // Minimum position
 #define MAX_POS             pos_2_5V            // Maximum position

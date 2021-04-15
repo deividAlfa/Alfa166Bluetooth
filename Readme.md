@@ -33,12 +33,17 @@ To provide the best compatibility there are some adjustable options:
 * Button polarity ("**POL**").<br>
 	Open = Button idle state 0V (Low Level).<br>
 	Closed = Button idle state VCC (High level).<br>
-			
+      
 * Auto resume ("**AR**").<br>
-	Make a test on your phone: Start playing a song. Put in pause and then skip to the next song.<br>
-	Adjust as follows:<br>
-	Open = In pause state, cellphone resumes playback automatically after skipping tracks.<br>
-	Closed = In pause state, cellphone doesn't resume playback automatically after skipping tracks.<br>
+  Make a test on your phone: Start playing a song. Put in pause and then skip to the next song.<br>
+  Adjust as follows:<br>
+  Open = In pause state, cellphone resumes playback automatically after skipping tracks.<br>
+  Closed = In pause state, cellphone doesn't resume playback automatically after skipping tracks.<br>
+      
+* **Play/Call**.<br>
+  This inputs selects the working mode of the ICS 1-2 button.<br>
+  Open = 1-2 button works as play/ pause button.<br>
+  Closed = 1-2 button works as call button,<br>
 	
 The pins can be left floating (open) or connect to ground (closed).<br>	
 	
@@ -52,7 +57,7 @@ There is an additional pin, **Play-pause-call** output.<br>
   
   
 Some phones or bluetooth modules don't like pressing the buttons too fast.<br>
-  If you have issues with the fastest (200mS), then try slower options (400, 600, 800, 1000mS).<br>
+  If you have issues with the fastest (400mS), then try slower options (600, 800mS).<br>
   If it always fails when quickly pressing ICS buttons, and none of the builds fixes it, it means the phone or bluetooth module can't take two consecutive next/prev pulses.<br>
   Use a **NoRepeat** build in that case.<br>
   

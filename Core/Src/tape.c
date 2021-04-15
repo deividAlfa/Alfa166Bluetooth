@@ -27,9 +27,9 @@ void initTape(void){
 
 void handleTape(void){
   uint32_t currentTime = HAL_GetTick();
-  tape.polarity = !HAL_GPIO_ReadPin(POLARITY_GPIO_Port, POLARITY_Pin);                // Update button polarity (So it can be changed on the fly)
-  tape.skipResume = HAL_GPIO_ReadPin(RESUME_GPIO_Port, RESUME_Pin);                   // Update skip resume status (So it can be changed on the fly)
-
+  tape.polarity = !HAL_GPIO_ReadPin(POLARITY_GPIO_Port, POLARITY_Pin);                // Update button polarity
+  tape.skipResume = HAL_GPIO_ReadPin(RESUME_GPIO_Port, RESUME_Pin);                   // Update skip resume status
+  tape.callOrPause = HAL_GPIO_ReadPin(CALL_PAUSE_GPIO_Port, CALL_PAUSE_Pin);          // Update call or pause status
   handlePosSensor();                                                                  // Handle position sensor
 
   /*********************************************************************************************************************
@@ -45,35 +45,26 @@ void handleTape(void){
   if(L_Plus && L_Minus && !tape.btnPushed && (MT_Rev || MT_Fwd)){                     // L+ =1 and L- =1, this means Tape active in a stable state
     tape.stopTimer = currentTime;
     if(!H_Speed){                                                                     // Not in in fast speed (revPlay or fwdPlay mode)
-      if(tape.status==status_play){
-        if(tape.BTstatus==status_pause){                                              // If BT paused after track change
-          if(!tape.skipResume){                                                       // If this phone doesn't resume playback automatically after skipping track
-            if(currentTime-tape.playTimer>resumeDelay){                               // Wait some time, as we just send the skip track pulse. If too fast, it will not work.
-              setButton(btn_play_pause);                                              // Resume now
-              tape.BTstatus=status_play;                                              // Set play state
+      if(tape.status==status_play){                                                   // If it was already in play state
+        uint8_t mode = tape.playMode;                                                 // Store current play direction
+        tape.playMode = MT_Rev ? revPlay : fwdPlay;                                   // Update play direction
+        if(tape.playMode!=mode){                                                      // If play mode changed
+          if(currentTime-tape.playTimer>delay1_2){                                    // If min time passed
+            if(tape.callOrPause){                                                     // If in play/pause mode
+              setButton(btn_play_pause);                                              // Press play/pause button
+              tape.BTstatus = tape.BTstatus==status_play ? status_pause : status_play;// Invert state
+            }
+            else{                                                                     // If in call mode
+              setButton(btn_call);                                                    // Press call button
             }
           }
-          else{                                                                       // This phone resumes playback automatically
-            tape.BTstatus=status_play;                                                // Set play state
-          }
-        }
-        if(MT_Rev){
-          if(tape.playMode!=revPlay){                                                 // Tape direction changed while in play mode
-            setButton(btn_call);                                                      // Press call button
-          }
-          tape.playMode = revPlay;                                                    // Update play mode (reverse)
-        }
-        else if(MT_Fwd){
-          if(tape.playMode != fwdPlay){                                               // Tape direction changed while in play mode
-            setButton(btn_call);                                                      // Press call button
-          }
-          tape.playMode = fwdPlay;                                                    // Update play mode (forward)
         }
       }
       else{                                                                           // Wasn't in play mode before?
         tape.enablePhoto = 1;                                                         // Enable photo sensor
         if( (tape.status==status_ffwd) || (tape.status==status_frwd) ){               // Was in a fast mode before?
-          if((currentTime-tape.skipTimer) < btnRepTim){                               // Check the timer, if it's low, the user exited fast mode by pushing the button again (Repeat button push)
+          uint16_t diff = currentTime-tape.skipTimer;
+          if(diff>btnRepTimLow && diff<btnRepTimHigh){                                // Check the timer, if it's low, the user exited fast mode by pushing the button again (Repeat button push)
             tape.skipTimer = 0;                                                       // Clear timer to avoid setting repeat again
             tape.repeatSkip = EnableRepeat;                                           // Enable repeat
           }
@@ -81,7 +72,7 @@ void handleTape(void){
           if(tape.skipBtn==btn_prev){                                                 // Previous track button was pushed
             setButton(btn_prev);                                                      // Repeat
           }
-          else if ( tape.skipBtn == btn_next ){                                       // Next track button was pushed
+          else if (tape.skipBtn==btn_next){                                           // Next track button was pushed
             setButton(btn_next);                                                      // Repeat
           }
 
@@ -91,20 +82,23 @@ void handleTape(void){
           else{                                                                       // If no repeat flag
             tape.status = status_play;                                                // Set play mode
             tape.playTimer = currentTime;                                             // Time when playing started
+            if(tape.BTstatus==status_pause){                                          // If BT paused after track change
+              if(!tape.skipResume){                                                   // If this phone doesn't resume playback automatically after skipping track
+                setButton(btn_play_pause);                                            // Resume now
+              }
+              else{                                                                   // This phone resumes playback automatically
+                tape.BTstatus=status_play;                                            // Set play state
+              }
+            }
           }
         }
         else{                                                                         // If not coming from skipping track
           if(tape.status==status_stop && tape.BTstatus==status_pause){                // If coming from stop mode and BT paused
             setButton(btn_play_pause);                                                // Resume playback
+            tape.BTstatus=status_play;
           }
           tape.status = status_play;                                                  // Set play mode
           tape.playTimer = currentTime;                                               // Time when playing started
-        }
-        if(MT_Rev){
-          tape.playMode = revPlay;                                                    // Update play mode (reverse)
-        }
-        else if(MT_Fwd){
-          tape.playMode = fwdPlay;                                                    // Update play mode (forward)
         }
       }
     }
@@ -137,7 +131,7 @@ void handleTape(void){
               tape.skipBtn = btn_prev;                                                // Send pulse to previous track button
             }
           }
-          if(tape.BTstatus!=status_pause){                                            // If not in pause
+          if(tape.BTstatus==status_play){                                             // If not in pause
             tape.BTstatus=status_pause;
             setButton(btn_play_pause);                                                // Pause now
           }
@@ -213,7 +207,7 @@ void handlePosSensor(void){
     pos.OutLevel = pos_2_5V;                                                          // Reset everything
     tape.enablePhoto = 1;
     if(currentTime-tape.stopTimer>stopDelay){                                         // If in stop state for more than 1 second
-      if(tape.status==status_play){                                                   // If it was in playback status
+      if(tape.BTstatus==status_play){                                                   // If it was in playback status
         setButton(btn_play_pause);                                                    // Pause playback
         tape.BTstatus=status_pause;
       }
