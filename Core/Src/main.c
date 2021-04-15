@@ -159,6 +159,9 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(BTN_PLAY_PAUSE_CALL_GPIO_Port, BTN_PLAY_PAUSE_CALL_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, BTN_CALL_Pin|BTN_PLAY_PAUSE_Pin|BTN_PREV_Pin|BTN_NEXT_Pin
                           |PHOTO_F_Pin|PHOTO_R_Pin, GPIO_PIN_RESET);
 
@@ -177,6 +180,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : BTN_PLAY_PAUSE_CALL_Pin */
+  GPIO_InitStruct.Pin = BTN_PLAY_PAUSE_CALL_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(BTN_PLAY_PAUSE_CALL_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : BTN_CALL_Pin BTN_PLAY_PAUSE_Pin BTN_PREV_Pin BTN_NEXT_Pin
                            POS_0_Pin POS_1_2_Pin POS_2_5_Pin PHOTO_F_Pin

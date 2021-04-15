@@ -40,6 +40,11 @@ To provide the best compatibility there are two adjustable options:
 	Open = In pause state, cellphone resumes playback automatically after skipping tracks.<br>
 	Closed = In pause state, cellphone doesn't resume playback automatically after skipping tracks.<br>
 	
+* Play-pause-call output.<br>
+  Some bluetooth modules use play button for all functions.<br>
+  In that case, use this output instead CALL or PLAY-PAUSE.<br>
+  If your module doesn't hace call feature, connecting this would also enable to use the 1-2 ICS button as play/pause.<br>
+  
 The pins can be left floating (open) or connect to ground (closed).<br>
 
 The outputs that handle the pulses for the buttons are set as open-drain (They only pull to ground, but don't put out voltage).<br>
@@ -58,9 +63,10 @@ All needed are some GPIOs and a timer to provide timing control.<br>
 
 <a id="use"></a>
 ## How to use
-- Connect to the bluetooth module and manually start playback in the phone.<br>
-- Set ICS in Tape mode.<br>
+- Connect to the bluetooth module to the phone.<br>
+- Set ICS in Tape mode. It will send Play command to the bluetooth module.<br>
 - Now the music should be playing. Use the steering wheel or ICS controls to skip tracks.<br>
+- When exiting tape mode in the ICS, it will pause the playback in the bluetooth too.
 
 <a id="limitations"></a>
 ## Limitations

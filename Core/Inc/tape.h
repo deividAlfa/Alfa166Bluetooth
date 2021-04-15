@@ -59,6 +59,7 @@ typedef enum{
   btn_prev,                                     // Previous track button
   btn_call,                                     // Call button
   btn_play_pause,                               // Play-Pause button
+  btn_play_pause_Call,                          // Play-Pause-call button
 
 }status_t;
 
@@ -70,6 +71,7 @@ typedef struct{
   volatile uint32_t         freqPhotoTimer;     // Timer for photo sensor signal generation
   volatile uint32_t         changedTimer;       // Timer for delay after skip tracks.
   volatile uint32_t         skipTimer;          // Timer To recognize if the tape returned to play mode by itself or if a button was pulsed again (add another pulse to the BT module)
+  volatile uint32_t         stopTimer;          // Time to measure stop state
 
   volatile uint8_t          skipCnt;            // Counter for consecutive skips. More than 4 fast skips will make the tape think it's stuck. Wait longer this time.
   volatile status_t         playMode;           // Last known play mode

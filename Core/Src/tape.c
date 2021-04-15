@@ -12,7 +12,7 @@
 
 void initTape(void){
   tape.status     = status_stop;                                                      // Initial tape state stop
-  tape.BTstatus   = status_play;                                                      // Assume BT is playing
+  tape.BTstatus   = status_pause;                                                     // Assume BT is paused
   pos.OutLevel    = pos_2_5V;                                                         // Default analog status = Tape inside
   pos.Status      = 0;                                                                // First state
   pos.Direction   = 1;                                                                // Initial position changing direction
@@ -35,13 +35,14 @@ void handleTape(void){
    *     Check Forward/Reverse inputs
    *********************************************************************************************************************/
 
-  if( ((currentTime-tape.freqPhotoTimer) > pulseDelay ) && tape.enablePhoto){         // Simulate the photo sensor pulses if active flag
+  if((tape.status==status_play) && ((currentTime-tape.freqPhotoTimer) > pulseDelay ) && tape.enablePhoto){         // Simulate the photo sensor pulses if active flag
     tape.freqPhotoTimer = currentTime;
     HAL_GPIO_TogglePin(PHOTO_R_GPIO_Port, PHOTO_R_Pin);                               // Toggle both sensors (they can be joined together)
     HAL_GPIO_TogglePin(PHOTO_F_GPIO_Port, PHOTO_F_Pin);                               // I use separated pins just in case something else can be done in the future
   }
 
   if(L_Plus && L_Minus && !tape.btnPushed && (MT_Rev || MT_Fwd)){                     // L+ =1 and L- =1, this means Tape active in a stable state
+    tape.stopTimer = currentTime;
     if(!H_Speed){                                                                     // Not in in fast speed (revPlay or fwdPlay mode)
       if(tape.status==status_play){
         if(tape.BTstatus==status_pause){                                              // If BT paused after track change
@@ -63,7 +64,7 @@ void handleTape(void){
         }
         else if(MT_Fwd){
           if(tape.playMode != fwdPlay){                                               // Tape direction changed while in play mode
-            setButton(btn_call);
+            setButton(btn_call);                                                      // Press call button
           }
           tape.playMode = fwdPlay;                                                    // Update play mode (forward)
         }
@@ -73,7 +74,7 @@ void handleTape(void){
         if( (tape.status==status_ffwd) || (tape.status==status_frwd) ){               // Was in a fast mode before?
           if((currentTime-tape.skipTimer) < btnRepTim){                               // Check the timer, if it's low, the user exited fast mode by pushing the button again (Repeat button push)
             tape.skipTimer = 0;                                                       // Clear timer to avoid setting repeat again
-            tape.repeatSkip = 1;                                                      // Enable repeat
+            tape.repeatSkip = 0;                                                      // Enable repeat
           }
 
           if(tape.skipBtn==btn_prev){                                                 // Previous track button was pushed
@@ -92,8 +93,17 @@ void handleTape(void){
           }
         }
         else{                                                                         // If not coming from skipping track
+          if(tape.status==status_stop && tape.BTstatus==status_pause){                // If coming from stop mode and BT paused
+            setButton(btn_play_pause);                                                // Resume playback
+          }
           tape.status = status_play;                                                  // Set play mode
           tape.playTimer = currentTime;                                               // Time when playing started
+        }
+        if(MT_Rev){
+          tape.playMode = revPlay;                                                    // Update play mode (reverse)
+        }
+        else if(MT_Fwd){
+          tape.playMode = fwdPlay;                                                    // Update play mode (forward)
         }
       }
     }
@@ -199,7 +209,13 @@ void handlePosSensor(void){
   if(!tape.btnPushed && !L_Plus && !L_Minus && (tape.status!=status_stop) ){          // L+ =0 and L- =0, this means tape disabled (ICS not in Tape mode)
     pos.OutLevel = pos_2_5V;                                                          // Reset everything
     tape.enablePhoto = 1;
-    tape.status = status_stop;
+    if(currentTime-tape.stopTimer>1000){                                              // If in stop state for more than 1 second
+      if(tape.status==status_play){                                                   // If it was in playback status
+        setButton(btn_play_pause);                                                    // Pause playback
+        tape.BTstatus=status_pause;
+      }
+      tape.status = status_stop;
+    }
   }
 
 /*********************************************************************************************************************
@@ -250,10 +266,12 @@ void setButton(status_t btn){
 
     case btn_call:                                                                    // Call button
       HAL_GPIO_WritePin(BTN_CALL_GPIO_Port,BTN_CALL_Pin,!tape.polarity);              // Set output depending on the polarity
+      HAL_GPIO_WritePin(BTN_PLAY_PAUSE_CALL_GPIO_Port,BTN_PLAY_PAUSE_CALL_Pin,!tape.polarity);
       break;
 
     case btn_play_pause:                                                              // Play/pause button
       HAL_GPIO_WritePin(BTN_PLAY_PAUSE_GPIO_Port,BTN_PLAY_PAUSE_Pin,!tape.polarity);  // Set output depending on the polarity
+      HAL_GPIO_WritePin(BTN_PLAY_PAUSE_CALL_GPIO_Port,BTN_PLAY_PAUSE_CALL_Pin,!tape.polarity);
       break;
 
     default:                                                                          // We shouldn't get any unknown value
