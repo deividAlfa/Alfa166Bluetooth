@@ -43,17 +43,20 @@ To provide the best compatibility there are some adjustable options:
 The pins can be left floating (open) or connect to ground (closed).<br>	
 	
 	
+	
 There is an additional pin, **Play-pause-call** output.<br>
   Some bluetooth modules use play button for all functions.<br>
   In that case, use this output instead CALL or PLAY-PAUSE.<br>
   If your module doesn't have call feature, connecting this would also enable to use the 1-2 ICS button as play/pause.<br>
   
   
-Some phones or bluetotoh modules don't like pressing the buttons too fast.<br>
+  
+Some phones or bluetooth modules don't like pressing the buttons too fast.<br>
   If you have issues with the fastest (200mS), then try slower options (400, 600, 800, 1000mS).<br>
   If it always fails when quickly pressing ICS buttons, and none of the builds fixes it, it means the phone or bluetooth module can't take two consecutive next/prev pulses.<br>
   Use a **NoRepeat** build in that case.<br>
   
+
 
 The outputs that handle the pulses for the buttons are set as open-drain (They only pull to ground, but don't put out voltage).<br>
 You will need to connect pull-up resistors to the working voltage of the bluetooth module.<br>
