@@ -212,7 +212,7 @@ void handlePosSensor(void){
   if(!tape.btnPushed && !L_Plus && !L_Minus && (tape.status!=status_stop) ){          // L+ =0 and L- =0, this means tape disabled (ICS not in Tape mode)
     pos.OutLevel = pos_2_5V;                                                          // Reset everything
     tape.enablePhoto = 1;
-    if(currentTime-tape.stopTimer>1000){                                              // If in stop state for more than 1 second
+    if(currentTime-tape.stopTimer>stopDelay){                                         // If in stop state for more than 1 second
       if(tape.status==status_play){                                                   // If it was in playback status
         setButton(btn_play_pause);                                                    // Pause playback
         tape.BTstatus=status_pause;

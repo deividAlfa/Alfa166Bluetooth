@@ -106,6 +106,7 @@ volatile int8_t             Direction;          // Switching direction
 #define btnRepTim           1200                // Time limit to recognize repeated button presses (The controller reverts automatically to play mode in 1.2-1.3 seconds, so below 1 second it's safe)
 #define resetTimeOnPlay     2000                // Time in play mode to reset the fast skip counter
 #define resumeDelay         300                 // After returning to playback state, time to wait before sending play pulse. If too fast the phobe might ignore it.
+#define stopDelay           50                  // Time in stop mode to actually set stop status
 
 #define MIN_POS             pos_0V              // Minimum position
 #define MAX_POS             pos_2_5V            // Maximum position
