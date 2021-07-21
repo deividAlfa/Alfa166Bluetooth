@@ -36,117 +36,116 @@ void handleTape(void){
    *     Check Forward/Reverse inputs
    *********************************************************************************************************************/
 
-  if((tape.status==status_play) && ((currentTime-tape.freqPhotoTimer) > pulseDelay ) && tape.enablePhoto){         // Simulate the photo sensor pulses if active flag
+  if(tape.enablePhoto && ((currentTime-tape.freqPhotoTimer) > pulseDelay )){            // Simulate the photo sensor pulses if active flag
     tape.freqPhotoTimer = currentTime;
-    HAL_GPIO_TogglePin(PHOTO_R_GPIO_Port, PHOTO_R_Pin);                               // Toggle both sensors (they can be joined together)
-    HAL_GPIO_TogglePin(PHOTO_F_GPIO_Port, PHOTO_F_Pin);                               // I use separated pins just in case something else can be done in the future
+    HAL_GPIO_TogglePin(PHOTO_R_GPIO_Port, PHOTO_R_Pin);                                 // Toggle both sensors (they can be joined together)
+    HAL_GPIO_TogglePin(PHOTO_F_GPIO_Port, PHOTO_F_Pin);                                 // I use separated pins just in case something else can be done in the future
   }
-
-  if(L_Plus && L_Minus && !tape.btnPushed && (MT_Rev || MT_Fwd)){                     // L+ =1 and L- =1, this means Tape active in a stable state
-    tape.stopTimer = currentTime;
-    if(!H_Speed){                                                                     // Not in in fast speed (revPlay or fwdPlay mode)
-      if(tape.status==status_play){                                                   // If it was already in play state
-        uint8_t mode = tape.playMode;                                                 // Store current play direction
-        tape.playMode = MT_Rev ? revPlay : fwdPlay;                                   // Update play direction
-        if(tape.playMode!=mode){                                                      // If play mode changed
-          if(currentTime-tape.playTimer>delay1_2){                                    // If min time passed
-            if(tape.callOrPause){                                                     // If in play/pause mode
-              setButton(btn_play_pause);                                              // Press play/pause button
-              tape.BTstatus = tape.BTstatus==status_play ? status_pause : status_play;// Invert state
+  if(!tape.btnPushed){
+    if(L_Plus && L_Minus && (MT_Rev || MT_Fwd)){                                        // L+ =1 and L- =1, this means Tape active in a stable state
+      tape.stopTimer = currentTime;
+      if(!H_Speed){                                                                     // Not in in fast speed (revPlay or fwdPlay mode)
+        if(tape.status==status_play){                                                   // If it was already in play state
+          uint8_t mode = tape.playMode;                                                 // Store current play direction
+          tape.playMode = MT_Rev ? revPlay : fwdPlay;                                   // Update play direction
+          if(tape.playMode!=mode && (currentTime-tape.playTimer>delay1_2)){             // If play mode changed and min time passed
+            if(tape.callOrPause){                                                       // If in play/pause mode
+              setButton(btn_play_pause);                                                // Press play/pause button
+              tape.BTstatus = tape.BTstatus==status_play ? status_pause : status_play;  // Invert state
             }
-            else{                                                                     // If in call mode
-              setButton(btn_call);                                                    // Press call button
+            else{                                                                       // If in call mode
+              setButton(btn_call);                                                      // Press call button
             }
           }
         }
-      }
-      else{                                                                           // Wasn't in play mode before?
-        tape.enablePhoto = 1;                                                         // Enable photo sensor
-        if( (tape.status==status_ffwd) || (tape.status==status_frwd) ){               // Was in a fast mode before?
-          uint16_t diff = currentTime-tape.skipTimer;
-          if(diff>btnRepTimLow && diff<btnRepTimHigh){                                // Check the timer, if it's low, the user exited fast mode by pushing the button again (Repeat button push)
-            tape.skipTimer = 0;                                                       // Clear timer to avoid setting repeat again
-            tape.repeatSkip = EnableRepeat;                                           // Enable repeat
-          }
+        else{                                                                           // Wasn't in play mode before?
+          tape.enablePhoto = 1;                                                         // Enable photo sensor
+          if( (tape.status==status_ffwd) || (tape.status==status_frwd) ){               // Was in a fast mode before?
+            uint16_t diff = currentTime-tape.skipTimer;
+            if(diff>btnRepTimLow && diff<btnRepTimHigh){                                // Check the timer, if it's low, the user exited fast mode by pushing the button again (Repeat button push)
+              tape.skipTimer = 0;                                                       // Clear timer to avoid setting repeat again
+              tape.repeatSkip = EnableRepeat;                                           // Enable repeat
+            }
 
-          if(tape.skipBtn==btn_prev){                                                 // Previous track button was pushed
-            setButton(btn_prev);                                                      // Repeat
-          }
-          else if (tape.skipBtn==btn_next){                                           // Next track button was pushed
-            setButton(btn_next);                                                      // Repeat
-          }
+            if(tape.skipBtn){                                                           // Previous track button was pushed
+              setButton(tape.skipBtn);                                                  // Repeat
+            }
 
-          if(tape.repeatSkip){                                                        // If repeat flag is set
-            tape.repeatSkip = 0;                                                      // Reset flag, the button will be presses again
-          }
-          else{                                                                       // If no repeat flag
-            tape.status = status_play;                                                // Set play mode
-            tape.playTimer = currentTime;                                             // Time when playing started
-            if(tape.BTstatus==status_pause){                                          // If BT paused after track change
-              if(!tape.skipResume){                                                   // If this phone doesn't resume playback automatically after skipping track
-                setButton(btn_play_pause);                                            // Resume now
-              }
-              else{                                                                   // This phone resumes playback automatically
-                tape.BTstatus=status_play;                                            // Set play state
+            if(tape.repeatSkip){                                                        // If repeat flag is set
+              tape.repeatSkip = 0;                                                      // Reset flag, the button will be presses again
+            }
+            else{                                                                       // If no repeat flag
+              tape.playMode = MT_Rev ? revPlay : fwdPlay;                               // Update play direction
+              tape.status = status_play;                                                // Set play mode
+              tape.playTimer = currentTime;                                             // Time when playing started
+              if(tape.BTstatus==status_pause){                                          // If BT paused after track change
+                if(!tape.skipResume){                                                   // If this phone doesn't resume playback automatically after skipping track
+                  setButton(btn_play_pause);                                            // Resume now
+                }
+                else{                                                                   // This phone resumes playback automatically
+                  tape.BTstatus=status_play;                                            // Set play state
+                }
               }
             }
+
+          }
+          else{                                                                         // If not coming from skipping track
+            if(tape.status==status_stop && tape.BTstatus==status_pause){                // If coming from stop mode and BT paused
+              setButton(btn_play_pause);                                                // Resume playback
+              tape.BTstatus=status_play;
+            }
+            tape.status = status_play;                                                  // Set play mode
+            tape.playTimer = currentTime;                                               // Time when playing started
+            tape.skipBtn = 0;
           }
         }
-        else{                                                                         // If not coming from skipping track
-          if(tape.status==status_stop && tape.BTstatus==status_pause){                // If coming from stop mode and BT paused
-            setButton(btn_play_pause);                                                // Resume playback
-            tape.BTstatus=status_play;
+      }
+      else{                                                                             // In high speed mode (Fast Rewind or Fast Forward)
+        if(MT_Fwd^MT_Rev){                                                              // What direction?
+          if( (tape.status!=status_frwd) && (tape.status!=status_ffwd) ){               // Wasn't in Fast mode before?
+            tape.repeatSkip = 0;                                                        // Reset repeat state
+            tape.skipCnt++;                                                             // Increase skipped track count
+            tape.delayPhotoTimer = currentTime;                                         // Update photo sensor disable timer
+            tape.skipTimer = currentTime;                                               // Update skip timer
+
+            if(MT_Fwd){                                                                 // Tape mechanism in Fast Forward mode
+              if(tape.playMode==revPlay){                                               // Was playing in reverse mode?
+                tape.status = status_frwd;                                              // Now we are in fast rewind
+                tape.skipBtn = btn_prev;                                                // Send pulse to previous track button
+              }
+              if(tape.playMode==fwdPlay){                                               // Was playing in forward mode?
+                tape.status = status_ffwd;                                              // Now we are in fast forward
+                tape.skipBtn = btn_next;                                                // Send pulse to next track button
+              }
+            }
+
+            if(MT_Rev){                                                                 // Tape mechanism in Fast Rewind mode
+              if(tape.playMode==revPlay){                                               // Was playing in reverse mode?
+                tape.status=status_ffwd;                                                // Now we are in fast forward
+                tape.skipBtn = btn_next;                                                // Send pulse to next track button
+              }
+              if(tape.playMode==fwdPlay){                                               // Was playing in forward mode?
+                tape.status=status_frwd;                                                // Now we are in fast rewind
+                tape.skipBtn = btn_prev;                                                // Send pulse to previous track button
+              }
+            }
+            if(tape.BTstatus==status_play){                                             // If not in pause
+              tape.BTstatus=status_pause;
+              setButton(btn_play_pause);                                                // Pause now
+            }
           }
-          tape.status = status_play;                                                  // Set play mode
-          tape.playTimer = currentTime;                                               // Time when playing started
         }
       }
     }
-    else{                                                                             // In high speed mode (Fast Rewind or Fast Forward)
-      if(MT_Fwd^MT_Rev){                                                              // What direction?
-        if( (tape.status!=status_frwd) && (tape.status!=status_ffwd) ){               // Wasn't in Fast mode before?
-          tape.repeatSkip = 0;                                                        // Reset repeat state
-          tape.skipCnt++;                                                             // Increase skipped track count
-          tape.delayPhotoTimer = currentTime;                                         // Update photo sensor disable timer
-          tape.skipTimer = currentTime;                                               // Update skip timer
-
-          if(MT_Fwd){                                                                 // Tape mechanism in Fast Forward mode
-            if(tape.playMode==revPlay){                                               // Was playing in reverse mode?
-              tape.status = status_frwd;                                              // Now we are in fast rewind
-              tape.skipBtn = btn_prev;                                                // Send pulse to previous track button
-            }
-            if(tape.playMode==fwdPlay){                                               // Was playing in forward mode?
-              tape.status = status_ffwd;                                              // Now we are in fast forward
-              tape.skipBtn = btn_next;                                                // Send pulse to next track button
-            }
-          }
-
-          if(MT_Rev){                                                                 // Tape mechanism in Fast Rewind mode
-            if(tape.playMode==revPlay){                                               // Was playing in reverse mode?
-              tape.status=status_ffwd;                                                // Now we are in fast forward
-              tape.skipBtn = btn_next;                                                // Send pulse to next track button
-            }
-            if(tape.playMode==fwdPlay){                                               // Was playing in forward mode?
-              tape.status=status_frwd;                                                // Now we are in fast rewind
-              tape.skipBtn = btn_prev;                                                // Send pulse to previous track button
-            }
-          }
-          if(tape.BTstatus==status_play){                                             // If not in pause
-            tape.BTstatus=status_pause;
-            setButton(btn_play_pause);                                                // Pause now
-          }
-    	  }
-    	}
-    }
-  }
-  if((tape.status==status_frwd) || (tape.status==status_ffwd)){                       // If in fast mode (Fast rewind or Fast forward)
-    if(tape.skipCnt>=MAX_FAST_SKIP){                                                  // Check we didn't skip more than 3 tracks in quick mode
-      if((currentTime-tape.delayPhotoTimer)>longPhotoDelay){                          // Otherwise wait the delay to avoid tape error triggering (Or tape controller will think the  tape is stuck)
-        tape.skipCnt = 0;                                                             // Once the delay is done, Reset count
+    if((tape.status==status_frwd) || (tape.status==status_ffwd)){                       // If in fast mode (Fast rewind or Fast forward)
+      if(tape.skipCnt>=MAX_FAST_SKIP){                                                  // Check we didn't skip more than 3 tracks in quick mode
+        if((currentTime-tape.delayPhotoTimer)>longPhotoDelay){                          // Otherwise wait the delay to avoid tape error triggering (Or tape controller will think the  tape is stuck)
+          tape.skipCnt = 0;                                                             // Once the delay is done, Reset count
+        }
       }
-    }
-    else{                                                                             // If less than 3 consecutively skipped tracks, no delay applied
-      tape.enablePhoto = 0;                                                           // Disable photo sensor pulses to simulate end of tape (back to play mode)
+      else{                                                                             // If less than 3 consecutively skipped tracks, no delay applied
+        tape.enablePhoto = 0;                                                           // Disable photo sensor pulses to simulate end of tape (back to play mode)
+      }
     }
   }
   if(tape.skipCnt){                                                                   // If there's any value in the skipped track counter
