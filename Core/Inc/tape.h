@@ -85,6 +85,7 @@ typedef struct{
   volatile bool             polarity;           // Flag to set the button polarity depending on the POL_TAPE input (Normally low, normally high)
   volatile bool             skipResume;         // Flag to indicate if the phone resumes playback after skipping a track (being n pause before)
   volatile bool             callOrPause;        // Flag to indicate the use of 1-2 button. As pause/resume or call output.
+  volatile bool             noRepeat;           // Flag to indicate if repeat functionality is disabled
   volatile bool             repeatSkip;         // Flag to indicate there's a repeat pending
 }tape_t;
 

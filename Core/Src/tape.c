@@ -30,6 +30,7 @@ void handleTape(void){
   tape.polarity = !HAL_GPIO_ReadPin(POLARITY_GPIO_Port, POLARITY_Pin);                // Update button polarity
   tape.skipResume = HAL_GPIO_ReadPin(RESUME_GPIO_Port, RESUME_Pin);                   // Update skip resume status
   tape.callOrPause = HAL_GPIO_ReadPin(CALL_PAUSE_GPIO_Port, CALL_PAUSE_Pin);          // Update call or pause status
+  tape.noRepeat = !HAL_GPIO_ReadPin(NO_REPEAT_GPIO_Port, NO_REPEAT_Pin);              // Update no repeat status
   handlePosSensor();                                                                  // Handle position sensor
 
   /*********************************************************************************************************************
@@ -64,7 +65,7 @@ void handleTape(void){
             uint16_t diff = currentTime-tape.skipTimer;
             if(diff>btnRepTimLow && diff<btnRepTimHigh){                                // Check the timer, if it's low, the user exited fast mode by pushing the button again (Repeat button push)
               tape.skipTimer = 0;                                                       // Clear timer to avoid setting repeat again
-              tape.repeatSkip = EnableRepeat;                                           // Enable repeat
+              tape.repeatSkip = !tape.noRepeat;                                         // Enable repeat?
             }
 
             if(tape.skipBtn){                                                           // Previous track button was pushed
