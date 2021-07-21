@@ -43,7 +43,12 @@ To provide the best compatibility there are some adjustable options:
 * **Play/Call**.<br>
   This inputs selects the working mode of the ICS 1-2 button.<br>
   Open = 1-2 button works as play/ pause button.<br>
-  Closed = 1-2 button works as call button,<br>
+  Closed = 1-2 button works as call button<br>
+      
+* **No Repeat**.<br>
+  If pushing the same button quickly causes issues with your phone, disable skip repeat functionality.<br>
+  Open = Button repeat is enabled (Double skip when hitting fast).<br>
+  Closed = Button repeat is disabled<br>
 	
 The pins can be left floating (open) or connect to ground (closed).<br>	
 	
