@@ -10,33 +10,56 @@
 #include "main.h"
 
 
-/***********************************************************
+ /***********************************************************************************************************************************************************************************************************************************************************
  *     TO CHANGE THE GPIO PINS, FOLLOW THIS TABLE (GPIO USER NAME IS SET IN CUBEMX):
  *
- *     GPIO NAME    MODE      OPTIONS
+ *     GPIO NAME            MODE      OPTIONS           DESCRIPTION.
+ * ***********************************************      Input signals.
+ *     MT_FWD               INPUT     NO PULL           Signal from board, spin motor in forward direction.
+ *     MTD_RVS              INPUT     NO PULL           Signal from board, spin motor in reverse direction.
+ *     H_SPEED              INPUT     NO PULL           Signal from board, spin motor in high speed.
+ *     L_plus               INPUT     NO PULL           Signal from board, lift or lower the reading head.
+ *     L_minus              INPUT     NO PULL           Same, opposite direction.
  *
- *     MT_FWD       INPUT     NO PULL
- *     MTD_RVS      INPUT     NO PULL
- *     H_SPEED      INPUT     NO PULL
- *     L_plus       INPUT     NO PULL
- *     L_minus      INPUT     NO PULL
- *     POLARITY     INPUT     PULL UP
- *     RESUME       INPUT     PULL UP
+ * ***********************************************      Config inputs.
+ *     POLARITY             INPUT     PULLUP            Output buttons polarity:
+ *                                                          Open:   Button idle state 0V (Low Level).
+ *                                                          Closed: Button idle state VCC (High level).
+ *     RESUME               INPUT     PULLUP            Auto Resume mode:
+ *                                                          Open:   In pause state, cellphone resumes playback automatically after skipping tracks.
+ *                                                          Closed: In pause state, cellphone doesn't resume playback automatically after skipping tracks.
+ *     CALL_PAUSE           INPUT     PULLUP            Play / Call. Selects the working mode of the ICS "1-2" button:
+ *                                                         Open:   Play / Pause.
+ *                                                         Closed: Answer Call.
+ *     NO_REPEAT            INPUT     PULLUP            If pushing the same button quickly causes issues with your phone, disable skip repeat functionality.
+ *                                                         Open:   Repeat is enabled (Multiple track skips when pressing the button fast).
+ *                                                         Closed: Repeat is disabled.
  *
- *     POS_0V       OUTPUT    OPEN DRAIN
- *     POS_1_2V     OUTPUT    OPEN DRAIN
- *     POS_2_5V     OUTPUT    OPEN DRAIN
- *     PHOTO_R      OUTPUT    OPEN DRAIN
- *     PHOTO_F      OUTPUT    OPEN DRAIN
- *     BTN_PREV     OUTPUT    OPEN DRAIN
- *     BTN_NEXT     OUTPUT    OPEN DRAIN
- *     BTN_CALL     OUTPUT    OPEN DRAIN
+ * ***********************************************      POS_SEN output: In the original tape mechanism, it's the output voltage from a potentiometer indicating the head position.
+ *                                                      The controller activates L+ (L_plus) or L- (L_minus) until it gets the voltage it wants.
+ *                                                      We simulate it with a crude DAC, only 3 steps are enough to trick the board. There's a 6K8 pullup to 5V in the ICS board.
+ *     POS_0V               OUTPUT    OPEN DRAIN        POS SEN pulled to ground.                          0V   = Tape inserted, head lowered (Playing).
+ *     POS_1_2V             OUTPUT    OPEN DRAIN        POS SEN pulled to ground through a 2K2 resistor.   1.2V = Tape inserted, head half-lowered (Moving).
+ *     POS_2_5V             OUTPUT    OPEN DRAIN        POS SEN pulled to ground through a 6K8 resistor.   2.5V = Tape inserted, head lifted (Stopped).
+ *                                                      All outputs disabled give 5V.                      5V   = No tape (Unused).
  *
- *    Be careful! If the outputs are not set as open drain, the pin will output 3.3V when high
- *    This might damage the bluetooth module if it works at a lower voltage, ex. 1.8V
+ * ***********************************************      Photodetector outputs.
+ *     PHOTO_R              OUTPUT    OPEN DRAIN        Pulses from one of the tape wheels, indicating it's moving.
+ *     PHOTO_F              OUTPUT    OPEN DRAIN        Pulses from ome of the tape wheels, indicating it's moving.
+ *                                                      When any stops, the radio detects the end of the tape and reverses the play direction. We use it as temporal pause when skipping tracks.
+ *
+ * ***********************************************      Button outputs for BT module.
+ *     BTN_PREV             OUTPUT    OPEN DRAIN        Previous track.
+ *     BTN_NEXT             OUTPUT    OPEN DRAIN        Next track.
+ *     BTN_CALL             OUTPUT    OPEN DRAIN        Answer Call.
+ *     BTN_PLAY_PAUSE       OUTPUT    OPEN DRAIN        Play Pause.
+ *     BTN_PLAY_PAUSE_CALL  OUTPUT    OPEN DRAIN        Play Pause Answer Call (Combines Play/Pause and Answer Call).
+ *
+ *    Be careful! If the outputs are not set as open drain, the pin will output 3.3V when high.
+ *    This might damage the bluetooth module if it works at a lower voltage, ex. 1.8V.
  *    Also, the photo sensors won't recognize a 3.3V signal, they need 5V pulses to work!
  *
- ************************************************************/
+ ***********************************************************************************************************************************************************************************************************************************************************/
 
 typedef enum{
   reset_val=0,
@@ -140,3 +163,4 @@ void setButton(status_t btn);
 void handleButtonReset(void);
 
 #endif /* INC_TAPE_H_ */
+
